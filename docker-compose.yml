@@ -1,0 +1,25 @@
+services:
+  maindb:
+    build:
+      context: ./docker/mysql/data
+      dockerfile: Dockerfile
+    container_name: go-clean-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: maindb
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: "redis:latest"
+    ports:
+      - 6379:6379
+    command: redis-server --requirepass password
+    volumes:
+      - ./docker/redis/data:/data
