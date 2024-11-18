@@ -22,8 +22,8 @@ func NewUserRedisRepository(client *redis.Client) UserRedisRepository {
 }
 
 func (c UserRedisRepository) SetWithTTL(ctx context.Context, user *model.User, ttl time.Duration) error {
-	entity := dto.ToRedisUserEntity(user)
-	jsonData, err := entity.ToJSON()
+	entity := dto.ToUserEntity(user)
+	jsonData, err := dto.ToJSON(entity)
 	if err != nil {
 		return fmt.Errorf("failed to marshal user: %w", err)
 	}
@@ -51,7 +51,7 @@ func (c UserRedisRepository) Get(ctx context.Context, id uuid.UUID) (*model.User
 		return nil, fmt.Errorf("failed to unmarshal user: %w", err)
 	}
 
-	return dto.ToRedisUserModel(entity)
+	return dto.ToUserModel(entity)
 }
 
 func (c UserRedisRepository) Delete(ctx context.Context, id uuid.UUID) error {

@@ -3,20 +3,13 @@ package dto
 import (
 	"encoding/json"
 	"errors"
-	"time"
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/entity"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
-type RedisUserEntity struct {
-	ID        string    `json:"id"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-}
-
-func ToRedisUserModel(entity *RedisUserEntity) (*model.User, error) {
+func ToUserModel(entity *entity.UserEntity) (*model.User, error) {
 	if !uuid.IsValidUUIDv7(entity.ID) {
 		return nil, errors.New("invalid UUIDv7 format")
 	}
@@ -29,10 +22,10 @@ func ToRedisUserModel(entity *RedisUserEntity) (*model.User, error) {
 	}, nil
 }
 
-func ToRedisUserModels(entities []*RedisUserEntity) ([]*model.User, error) {
+func ToUserModels(entities []*entity.UserEntity) ([]*model.User, error) {
 	var users []*model.User
 	for _, entity := range entities {
-		user, err := ToRedisUserModel(entity)
+		user, err := ToUserModel(entity)
 		if err != nil {
 			return nil, err
 		}
@@ -41,8 +34,8 @@ func ToRedisUserModels(entities []*RedisUserEntity) ([]*model.User, error) {
 	return users, nil
 }
 
-func ToRedisUserEntity(model *model.User) *RedisUserEntity {
-	return &RedisUserEntity{
+func ToUserEntity(model *model.User) *entity.UserEntity {
+	return &entity.UserEntity{
 		ID:        model.ID.String(),
 		Email:     model.Email,
 		CreatedAt: model.CreatedAt,
@@ -50,16 +43,24 @@ func ToRedisUserEntity(model *model.User) *RedisUserEntity {
 	}
 }
 
-func (e *RedisUserEntity) ToJSON() (string, error) {
-	bytes, err := json.Marshal(e)
+func ToUserEntities(models []*model.User) []*entity.UserEntity {
+	var entities []*entity.UserEntity
+	for _, model := range models {
+		entities = append(entities, ToUserEntity(model))
+	}
+	return entities
+}
+
+func ToJSON(entity *entity.UserEntity) (string, error) {
+	bytes, err := json.Marshal(entity)
 	if err != nil {
 		return "", err
 	}
 	return string(bytes), nil
 }
 
-func FromJSON(data string) (*RedisUserEntity, error) {
-	var entity RedisUserEntity
+func FromJSON(data string) (*entity.UserEntity, error) {
+	var entity entity.UserEntity
 	if err := json.Unmarshal([]byte(data), &entity); err != nil {
 		return nil, err
 	}

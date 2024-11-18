@@ -4,15 +4,12 @@ import (
 	"context"
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/dto"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 )
-
-type SQSRepository struct {
-	sqs *sqs.Client
-}
 
 type ReceiveMessageOptions struct {
 	MaxNumberOfMessages int32
@@ -21,22 +18,26 @@ type ReceiveMessageOptions struct {
 	AttributeNames      []string
 }
 
+type SQSRepository struct {
+	sqs *sqs.Client
+}
+
 func NewSQSRepository(sqs *sqs.Client) SQSRepository {
 	return SQSRepository{sqs: sqs}
 }
 
-func (r SQSRepository) SendMessage(ctx context.Context, queueURL string, message *dto.Message) error {
+func (r SQSRepository) SendMessage(ctx context.Context, queueURL string, message *entity.Message) error {
 	input := &sqs.SendMessageInput{
 		QueueUrl:          aws.String(queueURL),
 		MessageBody:       aws.String(message.Body),
-		MessageAttributes: message.ToSQSMessageAttributes(),
+		MessageAttributes: dto.ToSQSMessageAttributes(message.MessageAttributes),
 	}
 
 	_, err := r.sqs.SendMessage(ctx, input)
 	return err
 }
 
-func (r SQSRepository) ReceiveMessage(ctx context.Context, queueURL string, opts *ReceiveMessageOptions) ([]*dto.Message, error) {
+func (r SQSRepository) ReceiveMessage(ctx context.Context, queueURL string, opts *ReceiveMessageOptions) ([]*entity.Message, error) {
 	if opts == nil {
 		opts = &ReceiveMessageOptions{
 			MaxNumberOfMessages: 10,
@@ -62,7 +63,7 @@ func (r SQSRepository) ReceiveMessage(ctx context.Context, queueURL string, opts
 		return nil, err
 	}
 
-	messages := make([]*dto.Message, len(output.Messages))
+	messages := make([]*entity.Message, len(output.Messages))
 	for i, msg := range output.Messages {
 		messages[i] = dto.FromSQSMessage(msg)
 	}
@@ -87,7 +88,7 @@ func (r SQSRepository) ChangeMessageVisibility(ctx context.Context, queueURL str
 	return err
 }
 
-func (r SQSRepository) SendMessageBatch(ctx context.Context, queueURL string, messages []*dto.Message) error {
+func (r SQSRepository) SendMessageBatch(ctx context.Context, queueURL string, messages []*entity.Message) error {
 	if len(messages) == 0 {
 		return nil
 	}
@@ -97,7 +98,7 @@ func (r SQSRepository) SendMessageBatch(ctx context.Context, queueURL string, me
 		entries[i] = types.SendMessageBatchRequestEntry{
 			Id:                aws.String(msg.MessageId),
 			MessageBody:       aws.String(msg.Body),
-			MessageAttributes: msg.ToSQSMessageAttributes(),
+			MessageAttributes: dto.ToSQSMessageAttributes(msg.MessageAttributes),
 		}
 	}
 
@@ -110,7 +111,7 @@ func (r SQSRepository) SendMessageBatch(ctx context.Context, queueURL string, me
 	return err
 }
 
-func (r SQSRepository) DeleteMessageBatch(ctx context.Context, queueURL string, messages []*dto.Message) error {
+func (r SQSRepository) DeleteMessageBatch(ctx context.Context, queueURL string, messages []*entity.Message) error {
 	if len(messages) == 0 {
 		return nil
 	}

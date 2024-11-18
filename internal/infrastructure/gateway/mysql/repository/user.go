@@ -6,6 +6,7 @@ import (
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/dto"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/entity"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
@@ -35,7 +36,7 @@ func (r UserMySQLRepository) CreateTx(ctx context.Context, tx *sql.Tx, user *mod
 func (r UserMySQLRepository) List(ctx context.Context, limit, offset int) ([]*model.User, error) {
 	query := `SELECT id, email, created_at, updated_at FROM user LIMIT ? OFFSET ?`
 
-	var entities []*dto.UserEntity
+	var entities []*entity.UserEntity
 	rows, err := r.db.QueryContext(ctx, query, limit, offset)
 	if err != nil {
 		return nil, err
@@ -43,7 +44,7 @@ func (r UserMySQLRepository) List(ctx context.Context, limit, offset int) ([]*mo
 	defer rows.Close()
 
 	for rows.Next() {
-		var entity dto.UserEntity
+		var entity entity.UserEntity
 		if err := rows.Scan(
 			&entity.ID,
 			&entity.Email,
@@ -65,7 +66,7 @@ func (r UserMySQLRepository) List(ctx context.Context, limit, offset int) ([]*mo
 func (r UserMySQLRepository) Get(ctx context.Context, id uuid.UUID) (*model.User, error) {
 	query := `SELECT id, email, created_at, updated_at FROM user WHERE id = ?`
 
-	var entity dto.UserEntity
+	var entity entity.UserEntity
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
 		&entity.ID,
 		&entity.Email,
