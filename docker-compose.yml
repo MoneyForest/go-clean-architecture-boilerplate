@@ -1,9 +1,8 @@
 services:
   maindb:
     build:
-      context: ./docker/mysql/data
+      context: ./docker/mysql
       dockerfile: Dockerfile
-    container_name: go-clean-mysql
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: maindb

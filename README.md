@@ -79,6 +79,7 @@ graph TD
 
 2. **Usecase Layer** (`internal/usecase`) - Middle layer
    - Implements application-specific use cases
+   - Ensuring the integrity of the data store, such as DB transaction management, is also the responsibility of this layer.
    - `usecase/interactor`: Implements business logic that operates on domain models
    - `usecase/port`: Defines input and output ports
 
