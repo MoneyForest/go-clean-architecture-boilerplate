@@ -346,3 +346,47 @@ func TestUserInteractor_Delete(t *testing.T) {
 		})
 	}
 }
+
+func TestUserInteractor_ProcessMessage(t *testing.T) {
+	ctx := context.Background()
+	gw, err := testhelper.Setup(ctx)
+	if err != nil {
+		t.Fatalf("Failed to setup test: %v", err)
+	}
+	defer testhelper.Cleanup(ctx, gw)
+	userInteractor := SetupTestUserInteractor(ctx, gw)
+
+	tests := []struct {
+		name    string
+		input   *input.ProcessMessageInput
+		wantErr bool
+	}{
+		{
+			name: "OK",
+			input: &input.ProcessMessageInput{
+				ID: uuid.New(),
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := userInteractor.ProcessMessage(ctx, tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ProcessMessage() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if tt.wantErr {
+				return
+			}
+			if got == nil || got.ID == nil {
+				t.Error("ProcessMessage() got nil response")
+				return
+			}
+			if *got.ID != tt.input.ID {
+				t.Errorf("ProcessMessage() got = %v, want %v", *got.ID, tt.input.ID)
+			}
+		})
+	}
+}

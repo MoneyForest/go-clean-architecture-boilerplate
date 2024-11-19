@@ -13,7 +13,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/spf13/cobra v1.8.1
-	go.uber.org/mock v0.5.0
 )
 
 require (
