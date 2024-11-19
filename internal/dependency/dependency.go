@@ -55,7 +55,7 @@ func Inject(ctx context.Context) (*Dependency, error) {
 		return nil, err
 	}
 
-	// Initialize gateways
+	// Initialize repositories
 	mysqlUserRepository := mysqlRepo.NewUserMySQLRepository(mysqlClient)
 	redisUserRepository := redisRepo.NewUserRedisRepository(redisClient)
 	sqsRepository := sqsRepo.NewSQSRepository(sqsClient)
