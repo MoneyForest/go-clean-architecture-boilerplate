@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 
-	mysqlgateway "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql"
-	redisgateway "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis"
-	sqsgateway "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
+	mysqlgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql"
+	redisgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis"
+	sqsgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/redis/go-redis/v9"
 )
@@ -46,7 +46,7 @@ func Setup(ctx context.Context) (*Gateway, error) {
 		SQSEndpoint:   "",
 	}
 
-	mysqlClient, err := mysqlgateway.InitDB(ctx, mysqlgateway.DBConfig{
+	mysqlClient, err := mysqlgw.InitDB(ctx, mysqlgw.DBConfig{
 		Environment: e.Environment,
 		Host:        e.DBHost,
 		Port:        e.DBPort,
@@ -57,7 +57,7 @@ func Setup(ctx context.Context) (*Gateway, error) {
 	if err != nil {
 		return nil, err
 	}
-	redisClient, err := redisgateway.InitRedis(ctx, redisgateway.RedisConfig{
+	redisClient, err := redisgw.InitRedis(ctx, redisgw.RedisConfig{
 		Environment: e.Environment,
 		Host:        e.RedisHost,
 		Port:        e.RedisPort,
@@ -66,7 +66,7 @@ func Setup(ctx context.Context) (*Gateway, error) {
 	if err != nil {
 		return nil, err
 	}
-	sqsClient, err := sqsgateway.InitSQS(ctx, sqsgateway.SQSConfig{
+	sqsClient, err := sqsgw.InitSQS(ctx, sqsgw.SQSConfig{
 		Environment: e.Environment,
 		Region:      e.AWSRegion,
 		Endpoint:    e.SQSEndpoint,

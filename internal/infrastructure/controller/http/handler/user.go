@@ -55,7 +55,8 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input := adapter.ToCreateUserInput(&req)
-	if err := h.UserInteractor.Create(r.Context(), input); err != nil {
+	_, err := h.UserInteractor.Create(r.Context(), input)
+	if err != nil {
 		response.WriteError(w, err)
 		return
 	}
@@ -107,7 +108,8 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input := adapter.ToUpdateUserInput(&reqBody, params.ID)
-	if err := h.UserInteractor.Update(r.Context(), input); err != nil {
+	_, err := h.UserInteractor.Update(r.Context(), input)
+	if err != nil {
 		response.WriteError(w, err)
 		return
 	}
@@ -133,7 +135,8 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		ID: uuid.MustParse(params.ID),
 	}
 
-	if err := h.UserInteractor.Delete(r.Context(), input); err != nil {
+	_, err := h.UserInteractor.Delete(r.Context(), input)
+	if err != nil {
 		response.WriteError(w, err)
 		return
 	}
