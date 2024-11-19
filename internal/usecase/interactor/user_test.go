@@ -20,7 +20,7 @@ func SetupTestUserInteractor(ctx context.Context, gw *testhelper.Gateway) UserIn
 	return NewUserInteractor(
 		mysqlRepo.NewUserMySQLRepository(gw.MySQLClient),
 		redisRepo.NewUserRedisRepository(gw.RedisClient),
-		sqsRepo.NewSQSRepository(gw.SQSClient),
+		sqsRepo.NewSQSRepository(gw.SQSClient.Client, gw.SQSClient.QueueURLs["sample"]),
 	)
 }
 

@@ -26,6 +26,8 @@ go.work.sum
 .envrc
 
 # Docker
+docker/localstack/data/*
+!docker/localstack/data/.keep
 docker/mysql/data/*
 !docker/mysql/data/.keep
 docker/redis/data/*

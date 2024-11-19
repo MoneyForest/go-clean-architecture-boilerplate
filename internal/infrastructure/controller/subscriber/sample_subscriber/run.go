@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/dependency"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
@@ -15,14 +14,12 @@ type Message struct {
 }
 
 func Run(ctx context.Context, dependency *dependency.Dependency, args []string) error {
-	input := &input.ProcessMessageInput{}
-
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		default:
-			if err := dependency.UserInteractor.ProcessMessage(ctx, input); err != nil {
+			if err := dependency.UserInteractor.ProcessMessage(ctx); err != nil {
 				log.Printf("Error processing message: %v", err)
 				time.Sleep(5 * time.Second)
 			}

@@ -19,16 +19,17 @@ type ReceiveMessageOptions struct {
 }
 
 type SQSRepository struct {
-	sqs *sqs.Client
+	sqs       *sqs.Client
+	queueName string
 }
 
-func NewSQSRepository(sqs *sqs.Client) SQSRepository {
-	return SQSRepository{sqs: sqs}
+func NewSQSRepository(sqs *sqs.Client, queueName string) SQSRepository {
+	return SQSRepository{sqs: sqs, queueName: queueName}
 }
 
-func (r SQSRepository) SendMessage(ctx context.Context, queueURL string, message *entity.Message) error {
+func (r SQSRepository) SendMessage(ctx context.Context, message *entity.Message) error {
 	input := &sqs.SendMessageInput{
-		QueueUrl:          aws.String(queueURL),
+		QueueUrl:          aws.String(r.queueName),
 		MessageBody:       aws.String(message.Body),
 		MessageAttributes: dto.ToSQSMessageAttributes(message.MessageAttributes),
 	}
@@ -37,7 +38,7 @@ func (r SQSRepository) SendMessage(ctx context.Context, queueURL string, message
 	return err
 }
 
-func (r SQSRepository) ReceiveMessage(ctx context.Context, queueURL string, opts *ReceiveMessageOptions) ([]*entity.Message, error) {
+func (r SQSRepository) ReceiveMessage(ctx context.Context, opts *ReceiveMessageOptions) ([]*entity.Message, error) {
 	if opts == nil {
 		opts = &ReceiveMessageOptions{
 			MaxNumberOfMessages: 10,
@@ -46,7 +47,7 @@ func (r SQSRepository) ReceiveMessage(ctx context.Context, queueURL string, opts
 	}
 
 	input := &sqs.ReceiveMessageInput{
-		QueueUrl:            aws.String(queueURL),
+		QueueUrl:            aws.String(r.queueName),
 		MaxNumberOfMessages: opts.MaxNumberOfMessages,
 		WaitTimeSeconds:     opts.WaitTimeSeconds,
 		VisibilityTimeout:   opts.VisibilityTimeout,
@@ -71,9 +72,9 @@ func (r SQSRepository) ReceiveMessage(ctx context.Context, queueURL string, opts
 	return messages, nil
 }
 
-func (r SQSRepository) DeleteMessage(ctx context.Context, queueURL string, receiptHandle string) error {
+func (r SQSRepository) DeleteMessage(ctx context.Context, receiptHandle string) error {
 	_, err := r.sqs.DeleteMessage(ctx, &sqs.DeleteMessageInput{
-		QueueUrl:      aws.String(queueURL),
+		QueueUrl:      aws.String(r.queueName),
 		ReceiptHandle: aws.String(receiptHandle),
 	})
 	return err
@@ -81,14 +82,14 @@ func (r SQSRepository) DeleteMessage(ctx context.Context, queueURL string, recei
 
 func (r SQSRepository) ChangeMessageVisibility(ctx context.Context, queueURL string, receiptHandle string, visibilityTimeout int32) error {
 	_, err := r.sqs.ChangeMessageVisibility(ctx, &sqs.ChangeMessageVisibilityInput{
-		QueueUrl:          aws.String(queueURL),
+		QueueUrl:          aws.String(r.queueName),
 		ReceiptHandle:     aws.String(receiptHandle),
 		VisibilityTimeout: visibilityTimeout,
 	})
 	return err
 }
 
-func (r SQSRepository) SendMessageBatch(ctx context.Context, queueURL string, messages []*entity.Message) error {
+func (r SQSRepository) SendMessageBatch(ctx context.Context, messages []*entity.Message) error {
 	if len(messages) == 0 {
 		return nil
 	}
@@ -103,7 +104,7 @@ func (r SQSRepository) SendMessageBatch(ctx context.Context, queueURL string, me
 	}
 
 	input := &sqs.SendMessageBatchInput{
-		QueueUrl: aws.String(queueURL),
+		QueueUrl: aws.String(r.queueName),
 		Entries:  entries,
 	}
 
@@ -111,7 +112,7 @@ func (r SQSRepository) SendMessageBatch(ctx context.Context, queueURL string, me
 	return err
 }
 
-func (r SQSRepository) DeleteMessageBatch(ctx context.Context, queueURL string, messages []*entity.Message) error {
+func (r SQSRepository) DeleteMessageBatch(ctx context.Context, messages []*entity.Message) error {
 	if len(messages) == 0 {
 		return nil
 	}
@@ -125,7 +126,7 @@ func (r SQSRepository) DeleteMessageBatch(ctx context.Context, queueURL string, 
 	}
 
 	input := &sqs.DeleteMessageBatchInput{
-		QueueUrl: aws.String(queueURL),
+		QueueUrl: aws.String(r.queueName),
 		Entries:  entries,
 	}
 

@@ -16,4 +16,5 @@ export REDIS_PASSWORD="password"
 
 # SQS settings
 export AWS_REGION="ap-northeast-1"
-export SQS_ENDPOINT=""
+export AWS_ENDPOINT="http://localhost:4566"
+export SQS_QUEUE_NAME_SAMPLE="sample_queue"

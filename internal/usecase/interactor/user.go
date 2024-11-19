@@ -21,7 +21,7 @@ type UserInteractor interface {
 	List(ctx context.Context, input *input.ListUserInput) (*output.ListUserOutput, error)
 	Update(ctx context.Context, input *input.UpdateUserInput) (*output.UpdateUserOutput, error)
 	Delete(ctx context.Context, input *input.DeleteUserInput) (*output.DeleteUserOutput, error)
-	ProcessMessage(ctx context.Context, input *input.ProcessMessageInput) error
+	ProcessMessage(ctx context.Context) error
 }
 
 type userInteractor struct {
@@ -150,8 +150,8 @@ func (i *userInteractor) Delete(ctx context.Context, input *input.DeleteUserInpu
 	return &output.DeleteUserOutput{ID: deletedID}, nil
 }
 
-func (i *userInteractor) ProcessMessage(ctx context.Context, input *input.ProcessMessageInput) error {
-	msgs, err := i.sqs.ReceiveMessage(ctx, input.QueueURL, &sqs.ReceiveMessageOptions{
+func (i *userInteractor) ProcessMessage(ctx context.Context) error {
+	msgs, err := i.sqs.ReceiveMessage(ctx, &sqs.ReceiveMessageOptions{
 		MaxNumberOfMessages: 1,
 	})
 	if err != nil {
@@ -175,7 +175,7 @@ func (i *userInteractor) ProcessMessage(ctx context.Context, input *input.Proces
 		log.Printf("failed to set cache: %v\n", err)
 	}
 
-	if err := i.sqs.DeleteMessage(ctx, input.QueueURL, msg.ReceiptHandle); err != nil {
+	if err := i.sqs.DeleteMessage(ctx, msg.ReceiptHandle); err != nil {
 		return err
 	}
 

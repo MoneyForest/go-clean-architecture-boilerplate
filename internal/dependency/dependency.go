@@ -49,7 +49,10 @@ func Inject(ctx context.Context) (*Dependency, error) {
 	sqsClient, err := sqs.InitSQS(ctx, sqs.SQSConfig{
 		Environment: e.Environment,
 		Region:      e.AWSRegion,
-		Endpoint:    e.SQSEndpoint,
+		Endpoint:    e.AWSEndpoint,
+		QueueNames: map[sqs.Key]string{
+			sqs.SQSKeySample: e.SQSQueueNameSample,
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -58,10 +61,10 @@ func Inject(ctx context.Context) (*Dependency, error) {
 	// Initialize repositories
 	mysqlUserRepository := mysqlRepo.NewUserMySQLRepository(mysqlClient)
 	redisUserRepository := redisRepo.NewUserRedisRepository(redisClient)
-	sqsRepository := sqsRepo.NewSQSRepository(sqsClient)
+	sqsUserRepository := sqsRepo.NewSQSRepository(sqsClient.Client, e.SQSQueueNameSample)
 
 	// Initialize interactor
-	userInteractor := interactor.NewUserInteractor(mysqlUserRepository, redisUserRepository, sqsRepository)
+	userInteractor := interactor.NewUserInteractor(mysqlUserRepository, redisUserRepository, sqsUserRepository)
 
 	return &Dependency{
 		Environment:    e,

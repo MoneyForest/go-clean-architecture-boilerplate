@@ -7,43 +7,44 @@ import (
 	mysqlgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql"
 	redisgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis"
 	sqsgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/redis/go-redis/v9"
 )
 
 type Gateway struct {
 	MySQLClient *sql.DB
 	RedisClient *redis.Client
-	SQSClient   *sqs.Client
+	SQSClient   *sqsgw.SQSClient
 }
 
 type TestEnvironment struct {
-	Environment   string
-	DBHost        string
-	DBPort        string
-	DBUser        string
-	DBPassword    string
-	DBDatabase    string
-	RedisHost     string
-	RedisPort     string
-	RedisPassword string
-	AWSRegion     string
-	SQSEndpoint   string
+	Environment        string
+	DBHost             string
+	DBPort             string
+	DBUser             string
+	DBPassword         string
+	DBDatabase         string
+	RedisHost          string
+	RedisPort          string
+	RedisPassword      string
+	AWSRegion          string
+	AWSEndpoint        string
+	SQSQueueNameSample string
 }
 
 func Setup(ctx context.Context) (*Gateway, error) {
 	e := &TestEnvironment{
-		Environment:   "test",
-		DBHost:        "localhost",
-		DBPort:        "3306",
-		DBUser:        "root",
-		DBPassword:    "password",
-		DBDatabase:    "maindb",
-		RedisHost:     "localhost",
-		RedisPort:     "6379",
-		RedisPassword: "password",
-		AWSRegion:     "ap-northeast-1",
-		SQSEndpoint:   "",
+		Environment:        "test",
+		DBHost:             "localhost",
+		DBPort:             "3306",
+		DBUser:             "root",
+		DBPassword:         "password",
+		DBDatabase:         "maindb",
+		RedisHost:          "localhost",
+		RedisPort:          "6379",
+		RedisPassword:      "password",
+		AWSRegion:          "ap-northeast-1",
+		AWSEndpoint:        "http://localhost:4566",
+		SQSQueueNameSample: "sample_queue",
 	}
 
 	mysqlClient, err := mysqlgw.InitDB(ctx, mysqlgw.DBConfig{
@@ -69,7 +70,8 @@ func Setup(ctx context.Context) (*Gateway, error) {
 	sqsClient, err := sqsgw.InitSQS(ctx, sqsgw.SQSConfig{
 		Environment: e.Environment,
 		Region:      e.AWSRegion,
-		Endpoint:    e.SQSEndpoint,
+		Endpoint:    e.AWSEndpoint,
+		QueueNames:  map[sqsgw.Key]string{sqsgw.KeySample: e.SQSQueueNameSample},
 	})
 	if err != nil {
 		return nil, err
