@@ -1,0 +1,20 @@
+# Application settings
+export PORT="8080"
+export ENV="local"
+
+# Database settings
+export DB_HOST="localhost"
+export DB_PORT="3306"
+export DB_USER="root"
+export DB_PASSWORD="password"
+export DB_DATABASE="maindb"
+
+# Redis settings
+export REDIS_HOST="localhost"
+export REDIS_PORT="6379"
+export REDIS_PASSWORD="password"
+
+# SQS settings
+export AWS_REGION="ap-northeast-1"
+export AWS_ENDPOINT="http://localhost:4566"
+export SQS_QUEUE_NAME_SAMPLE="sample_queue"
