@@ -16,3 +16,7 @@ func IsValidUUIDv7(id string) bool {
 func MustParse(id string) UUID {
 	return uuid.MustParse(id)
 }
+
+func Nil() UUID {
+	return uuid.Nil
+}

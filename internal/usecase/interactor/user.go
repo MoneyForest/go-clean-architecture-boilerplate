@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/validate"
 	mysql "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
 	redis "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/repository"
 	sqs "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/repository"
@@ -40,8 +39,8 @@ func NewUserInteractor(mysql mysql.UserMySQLRepository, redis redis.UserRedisRep
 }
 
 func (i *userInteractor) Create(ctx context.Context, input *input.CreateUserInput) error {
-	user := model.NewUser(input.Email)
-	if err := validate.ValidateUser(user); err != nil {
+	user := model.NewUser(model.InputUserParams{ID: uuid.Nil(), Email: input.Email})
+	if err := user.Validate(); err != nil {
 		return err
 	}
 
@@ -94,11 +93,8 @@ func (i *userInteractor) List(ctx context.Context, input *input.ListUserInput) (
 }
 
 func (i *userInteractor) Update(ctx context.Context, input *input.UpdateUserInput) error {
-	user := &model.User{
-		ID:    input.ID,
-		Email: input.Email,
-	}
-	if err := validate.ValidateUser(user); err != nil {
+	user := model.NewUser(model.InputUserParams{ID: input.ID, Email: input.Email})
+	if err := user.Validate(); err != nil {
 		return err
 	}
 
