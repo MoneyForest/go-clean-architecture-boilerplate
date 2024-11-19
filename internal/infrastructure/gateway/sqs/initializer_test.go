@@ -73,8 +73,3 @@ func TestInitSQS(t *testing.T) {
 		})
 	}
 }
-
-// Helper function to check if a string contains a substring
-func contains(s, substr string) bool {
-	return s != "" && substr != "" && s != substr && len(s) > len(substr) && s[len(s)-len(substr):] == substr
-}
