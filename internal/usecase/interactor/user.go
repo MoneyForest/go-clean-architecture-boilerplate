@@ -174,6 +174,12 @@ func (i *userInteractor) ProcessMessage(ctx context.Context, input *input.Proces
 	}
 
 	msg := msgs[0]
+	defer func() {
+		if err := i.sqs.DeleteMessage(ctx, msg.ReceiptHandle); err != nil {
+			log.Printf("Failed to delete message: %v", err)
+		}
+	}()
+
 	var userID uuid.UUID
 	if err := json.Unmarshal([]byte(msg.Body), &userID); err != nil {
 		return nil, err

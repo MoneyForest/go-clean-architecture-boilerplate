@@ -3,6 +3,9 @@ package testhelper
 import (
 	"context"
 	"log"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
 func Cleanup(ctx context.Context, g *Gateway) {
@@ -40,6 +43,22 @@ func Cleanup(ctx context.Context, g *Gateway) {
 		}
 		if err := g.RedisClient.Close(); err != nil {
 			log.Printf("failed to close Redis connection: %v", err)
+		}
+	}
+
+	if g.SQSClient != nil {
+		result, err := g.SQSClient.Client.ListQueues(ctx, &sqs.ListQueuesInput{})
+		if err != nil {
+			log.Printf("failed to list SQS queues: %v", err)
+		} else {
+			for _, queueURL := range result.QueueUrls {
+				_, err := g.SQSClient.Client.PurgeQueue(ctx, &sqs.PurgeQueueInput{
+					QueueUrl: aws.String(queueURL),
+				})
+				if err != nil {
+					log.Printf("failed to purge queue %s: %v", queueURL, err)
+				}
+			}
 		}
 	}
 }
