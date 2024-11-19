@@ -38,11 +38,25 @@ func InitSQS(ctx context.Context, cfg SQSConfig) (*SQSClient, error) {
 		if cfg.Endpoint == "" {
 			return nil, fmt.Errorf("SQS endpoint is required for local/test environment")
 		}
+		options = append(options, config.WithCredentialsProvider(aws.CredentialsProviderFunc(
+			func(ctx context.Context) (aws.Credentials, error) {
+				return aws.Credentials{
+					AccessKeyID:     "dummy",
+					SecretAccessKey: "dummy",
+					SessionToken:    "dummy",
+				}, nil
+			},
+		)))
 		customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-			return aws.Endpoint{
-				URL:           cfg.Endpoint,
-				SigningRegion: cfg.Region,
-			}, nil
+			if service == sqs.ServiceID {
+				return aws.Endpoint{
+					PartitionID:       "aws",
+					URL:               cfg.Endpoint,
+					SigningRegion:     cfg.Region,
+					HostnameImmutable: true,
+				}, nil
+			}
+			return aws.Endpoint{}, fmt.Errorf("unknown service %s", service)
 		})
 		options = append(options, config.WithEndpointResolverWithOptions(customResolver))
 	default:
