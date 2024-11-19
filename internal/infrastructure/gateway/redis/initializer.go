@@ -21,7 +21,7 @@ func InitRedis(ctx context.Context, config RedisConfig) (*redis.Client, error) {
 	var options *redis.Options
 
 	switch config.Environment {
-	case "local":
+	case "local", "test":
 		options = &redis.Options{
 			Addr:         fmt.Sprintf("%s:%s", config.Host, config.Port),
 			Password:     config.Password,
@@ -32,6 +32,10 @@ func InitRedis(ctx context.Context, config RedisConfig) (*redis.Client, error) {
 			PoolTimeout:  4 * time.Second,
 			MaxRetries:   3,
 			MinIdleConns: 5,
+		}
+
+		if config.Environment == "test" {
+			options.DB = 1
 		}
 	default:
 		return nil, fmt.Errorf("invalid environment: %s", config.Environment)
