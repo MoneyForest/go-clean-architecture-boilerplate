@@ -28,5 +28,5 @@ go.work.sum
 # Docker
 docker/mysql/data/*
 !docker/mysql/data/.keep
-docker/redis/*
-!docker/redis/.keep
+docker/redis/data/*
+!docker/redis/data/.keep
