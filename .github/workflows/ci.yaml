@@ -54,6 +54,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: test
           AWS_ENDPOINT_URL: http://localhost:4566
           AWS_REGION: ap-northeast-1
+          AWS_EC2_METADATA_DISABLED: true
         run: sudo go test ./...
 
       - name: Clean up
