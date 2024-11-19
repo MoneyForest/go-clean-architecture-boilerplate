@@ -16,7 +16,7 @@ func TestInitDB(t *testing.T) {
 		{
 			name: "OK",
 			config: DBConfig{
-				Environment: "local",
+				Environment: "test",
 				Host:        "localhost",
 				Port:        "3306",
 				User:        "root",
