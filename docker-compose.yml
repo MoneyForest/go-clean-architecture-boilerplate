@@ -1,5 +1,5 @@
 services:
-  maindb:
+  mysql:
     build:
       context: ./docker/mysql
       dockerfile: Dockerfile
@@ -23,7 +23,9 @@ services:
     volumes:
       - ./docker/redis/data:/data
   localstack:
-    build: ./docker/localstack
+    build:
+      context: ./docker/localstack
+      dockerfile: Dockerfile
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./docker/localstack/data:/var/lib/localstack
