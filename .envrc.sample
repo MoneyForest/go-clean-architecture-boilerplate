@@ -13,3 +13,7 @@ export DB_DATABASE="maindb"
 export REDIS_HOST="localhost"
 export REDIS_PORT="6379"
 export REDIS_PASSWORD="password"
+
+# SQS settings
+export AWS_REGION="ap-northeast-1"
+export SQS_ENDPOINT=""

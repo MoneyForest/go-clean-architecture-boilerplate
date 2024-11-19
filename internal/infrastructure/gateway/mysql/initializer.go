@@ -24,7 +24,7 @@ func InitDB(ctx context.Context, config DBConfig) (*sql.DB, error) {
 	var dsn string
 
 	switch config.Environment {
-	case "local":
+	case "local", "test":
 		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&charset=utf8mb4&collation=utf8mb4_unicode_ci",
 			config.User,
 			config.Password,

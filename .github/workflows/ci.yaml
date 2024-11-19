@@ -29,13 +29,27 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Docker Compose
+        run: docker compose up -d
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
           cache: true
+
+      - name: Wait for containers
+        run: |
+          timeout 30s bash -c 'until docker compose exec -T mysql mysqladmin ping -h localhost -u root -proot --silent; do sleep 1; done'
+          timeout 10s bash -c 'until docker compose exec -T redis redis-cli ping; do sleep 1; done'
+
       - name: test
         run: go test ./...
+
+      - name: Clean up
+        if: always()
+        run: docker compose down
 
   lint-go:
     runs-on: ubuntu-latest

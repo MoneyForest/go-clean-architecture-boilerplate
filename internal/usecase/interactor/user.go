@@ -16,11 +16,11 @@ import (
 )
 
 type UserInteractor interface {
-	Create(ctx context.Context, input *input.CreateUserInput) error
+	Create(ctx context.Context, input *input.CreateUserInput) (*output.CreateUserOutput, error)
 	Get(ctx context.Context, input *input.GetUserInput) (*output.GetUserOutput, error)
 	List(ctx context.Context, input *input.ListUserInput) (*output.ListUserOutput, error)
-	Update(ctx context.Context, input *input.UpdateUserInput) error
-	Delete(ctx context.Context, input *input.DeleteUserInput) error
+	Update(ctx context.Context, input *input.UpdateUserInput) (*output.UpdateUserOutput, error)
+	Delete(ctx context.Context, input *input.DeleteUserInput) (*output.DeleteUserOutput, error)
 	ProcessMessage(ctx context.Context, input *input.ProcessMessageInput) error
 }
 
@@ -38,15 +38,15 @@ func NewUserInteractor(mysql mysql.UserMySQLRepository, redis redis.UserRedisRep
 	}
 }
 
-func (i *userInteractor) Create(ctx context.Context, input *input.CreateUserInput) error {
+func (i *userInteractor) Create(ctx context.Context, input *input.CreateUserInput) (*output.CreateUserOutput, error) {
 	user := model.NewUser(model.InputUserParams{ID: uuid.Nil(), Email: input.Email})
 	if err := user.Validate(); err != nil {
-		return err
+		return nil, err
 	}
 
 	tx, err := i.mysql.BeginTx(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() {
 		if err := tx.Rollback(); err != nil {
@@ -54,18 +54,19 @@ func (i *userInteractor) Create(ctx context.Context, input *input.CreateUserInpu
 		}
 	}()
 
-	if err := i.mysql.CreateTx(ctx, tx, user); err != nil {
-		return err
+	createdUser, err := i.mysql.CreateTx(ctx, tx, user)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := tx.Commit(); err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := i.redis.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
 		log.Printf("failed to set cache: %v\n", err)
 	}
-	return nil
+	return &output.CreateUserOutput{User: createdUser}, nil
 }
 
 func (i *userInteractor) Get(ctx context.Context, input *input.GetUserInput) (*output.GetUserOutput, error) {
@@ -92,15 +93,15 @@ func (i *userInteractor) List(ctx context.Context, input *input.ListUserInput) (
 	return &output.ListUserOutput{Users: users}, nil
 }
 
-func (i *userInteractor) Update(ctx context.Context, input *input.UpdateUserInput) error {
+func (i *userInteractor) Update(ctx context.Context, input *input.UpdateUserInput) (*output.UpdateUserOutput, error) {
 	user := model.NewUser(model.InputUserParams{ID: input.ID, Email: input.Email})
 	if err := user.Validate(); err != nil {
-		return err
+		return nil, err
 	}
 
 	tx, err := i.mysql.BeginTx(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() {
 		if err := tx.Rollback(); err != nil {
@@ -108,24 +109,25 @@ func (i *userInteractor) Update(ctx context.Context, input *input.UpdateUserInpu
 		}
 	}()
 
-	if err := i.mysql.UpdateTx(ctx, tx, user); err != nil {
-		return err
+	updatedUser, err := i.mysql.UpdateTx(ctx, tx, user)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := tx.Commit(); err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := i.redis.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
 		log.Printf("failed to set cache: %v\n", err)
 	}
-	return nil
+	return &output.UpdateUserOutput{User: updatedUser}, nil
 }
 
-func (i *userInteractor) Delete(ctx context.Context, input *input.DeleteUserInput) error {
+func (i *userInteractor) Delete(ctx context.Context, input *input.DeleteUserInput) (*output.DeleteUserOutput, error) {
 	tx, err := i.mysql.BeginTx(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() {
 		if err := tx.Rollback(); err != nil {
@@ -133,15 +135,19 @@ func (i *userInteractor) Delete(ctx context.Context, input *input.DeleteUserInpu
 		}
 	}()
 
-	if err := i.mysql.DeleteTx(ctx, tx, input.ID); err != nil {
-		return err
+	deletedID, err := i.mysql.DeleteTx(ctx, tx, input.ID)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := tx.Commit(); err != nil {
-		return err
+		return nil, err
 	}
 
-	return i.redis.Delete(ctx, input.ID)
+	if err := i.redis.Delete(ctx, input.ID); err != nil {
+		log.Printf("failed to delete cache: %v\n", err)
+	}
+	return &output.DeleteUserOutput{ID: deletedID}, nil
 }
 
 func (i *userInteractor) ProcessMessage(ctx context.Context, input *input.ProcessMessageInput) error {
