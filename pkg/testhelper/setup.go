@@ -71,7 +71,7 @@ func Setup(ctx context.Context) (*Gateway, error) {
 		Environment: e.Environment,
 		Region:      e.AWSRegion,
 		Endpoint:    e.AWSEndpoint,
-		QueueNames:  map[sqsgw.Key]string{sqsgw.KeySample: e.SQSQueueNameSample},
+		QueueNames:  map[sqsgw.Key]string{sqsgw.SQSKeySample: e.SQSQueueNameSample},
 	})
 	if err != nil {
 		return nil, err

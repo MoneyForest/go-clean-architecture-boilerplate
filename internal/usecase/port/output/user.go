@@ -24,3 +24,7 @@ type UpdateUserOutput struct {
 type DeleteUserOutput struct {
 	ID *uuid.UUID `json:"id"`
 }
+
+type ProcessMessageOutput struct {
+	ID *uuid.UUID `json:"id"`
+}

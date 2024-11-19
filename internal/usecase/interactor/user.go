@@ -9,6 +9,7 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	mysql "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
 	redis "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/repository"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
 	sqs "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/output"
@@ -21,7 +22,7 @@ type UserInteractor interface {
 	List(ctx context.Context, input *input.ListUserInput) (*output.ListUserOutput, error)
 	Update(ctx context.Context, input *input.UpdateUserInput) (*output.UpdateUserOutput, error)
 	Delete(ctx context.Context, input *input.DeleteUserInput) (*output.DeleteUserOutput, error)
-	ProcessMessage(ctx context.Context) error
+	ProcessMessage(ctx context.Context, input *input.ProcessMessageInput) (*output.ProcessMessageOutput, error)
 }
 
 type userInteractor struct {
@@ -150,35 +151,34 @@ func (i *userInteractor) Delete(ctx context.Context, input *input.DeleteUserInpu
 	return &output.DeleteUserOutput{ID: deletedID}, nil
 }
 
-func (i *userInteractor) ProcessMessage(ctx context.Context) error {
+func (i *userInteractor) ProcessMessage(ctx context.Context, input *input.ProcessMessageInput) (*output.ProcessMessageOutput, error) {
+	userIDBytes, err := json.Marshal(input.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := i.sqs.SendMessage(ctx, &entity.Message{
+		Body: string(userIDBytes),
+	}); err != nil {
+		return nil, err
+	}
+
 	msgs, err := i.sqs.ReceiveMessage(ctx, &sqs.ReceiveMessageOptions{
 		MaxNumberOfMessages: 1,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if len(msgs) == 0 {
-		return nil
+		return nil, nil
 	}
 
 	msg := msgs[0]
 	var userID uuid.UUID
 	if err := json.Unmarshal([]byte(msg.Body), &userID); err != nil {
-		return err
-	}
-
-	user, err := i.mysql.Get(ctx, userID)
-	if err != nil {
-		return err
-	}
-	if err := i.redis.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
-		log.Printf("failed to set cache: %v\n", err)
-	}
-
-	if err := i.sqs.DeleteMessage(ctx, msg.ReceiptHandle); err != nil {
-		return err
+		return nil, err
 	}
 
 	log.Printf("Dequeued user_id: %s\n", userID)
-	return nil
+	return &output.ProcessMessageOutput{ID: &userID}, nil
 }

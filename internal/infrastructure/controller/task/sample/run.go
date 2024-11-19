@@ -1,4 +1,4 @@
-package sample_task
+package sample
 
 import (
 	"context"

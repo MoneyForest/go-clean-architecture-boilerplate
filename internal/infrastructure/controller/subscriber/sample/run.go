@@ -1,4 +1,4 @@
-package sample_subscriber
+package sample
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/dependency"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
@@ -19,7 +20,9 @@ func Run(ctx context.Context, dependency *dependency.Dependency, args []string) 
 		case <-ctx.Done():
 			return nil
 		default:
-			if err := dependency.UserInteractor.ProcessMessage(ctx); err != nil {
+			if _, err := dependency.UserInteractor.ProcessMessage(ctx, &input.ProcessMessageInput{
+				ID: uuid.New(),
+			}); err != nil {
 				log.Printf("Error processing message: %v", err)
 				time.Sleep(5 * time.Second)
 			}

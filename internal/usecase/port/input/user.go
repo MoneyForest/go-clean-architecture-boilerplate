@@ -25,5 +25,5 @@ type DeleteUserInput struct {
 }
 
 type ProcessMessageInput struct {
-	QueueURL string `json:"queue_url"`
+	ID uuid.UUID `json:"id"`
 }

@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/task"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/task/sample_task"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/task/sample"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +19,7 @@ func TaskCmd() *cobra.Command {
 		Use:   "sample",
 		Short: "sample",
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := task.Run(sample_task.Run, args); err != nil {
+			if err := task.Run(sample.Run, args); err != nil {
 				log.Fatal(err)
 			}
 		},
