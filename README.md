@@ -70,6 +70,10 @@ graph TD
     classDef external fill:#2c4a9b,stroke:#333,stroke-width:2px,color:#fff
 ```
 
+- Domain Service handles shared business logic between use cases
+- Port/Adapter pattern converts data between layers
+- Repository interfaces control transaction boundaries
+
 ### Dependency Rules
 
 1. Dependencies always point inwards
@@ -81,21 +85,32 @@ graph TD
    - Repository interfaces are defined in the domain layer
    - Implementations are provided in the infrastructure layer
 
+3. Transaction Management
+   - Repository layer defines transaction operations (BeginTx/Commit/Rollback)
+   - Use case layer controls transaction flow
+   - Implementation provided in infrastructure layer
+
 ### Layer Mapping to Directory
 
 1. **Domain Layer** (`internal/domain`) - Innermost layer
    - Defines pure business logic independent of external implementations
    - `domain/model`: Core business entities and rules
    - `domain/repository`: Interfaces defining operations on domain models
+   - `domain/service`: Contains shared domain logic and business rules
 
 2. **Usecase Layer** (`internal/usecase`) - Middle layer
    - Implements application-specific use cases
-   - Ensuring the integrity of the data store, such as DB transaction management, is also the responsibility of this layer.
+   - Transaction flow control and rollback handling
+   - Input/Output port separation for clean boundaries
+   - Data transformation between layers
    - `usecase/interactor`: Implements business logic that operates on domain models
    - `usecase/port`: Defines input and output ports
 
 3. **Infrastructure Layer** (`internal/infrastructure`) - Outermost layer
    - Concrete implementations of interfaces with external systems, frameworks, and databases
+   Implements transaction management in repositories
+   - Provides adapters for format conversion
+   - Error handling and logging implementation
    - `infrastructure/cmd`: Implements routing from entry points to controllers based on commands
    - `infrastructure/controller`: Implements HTTP servers, gRPC servers, commands, and subscribers
    - `infrastructure/gateway`: Connects to external systems (MySQL, Redis)
@@ -106,7 +121,8 @@ graph TD
 ├── internal
 │   ├── domain
 │   │   ├── model
-│   │   └── repository
+│   │   ├── repository
+│   │   └── service
 │   │
 │   ├── usecase
 │   │   ├── interactor
