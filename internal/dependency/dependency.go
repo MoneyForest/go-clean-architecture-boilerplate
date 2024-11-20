@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/environment"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/aws"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql"
 	mysqlRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis"
@@ -46,10 +47,11 @@ func Inject(ctx context.Context) (*Dependency, error) {
 	if err != nil {
 		return nil, err
 	}
-	sqsClient, err := sqs.InitSQS(ctx, sqs.SQSConfig{
+	sqsClient, err := sqs.InitSQS(ctx, aws.AWSConfig{
 		Environment: e.Environment,
 		Region:      e.AWSRegion,
 		Endpoint:    e.AWSEndpoint,
+	}, sqs.SQSConfig{
 		QueueNames: map[sqs.Key]string{
 			sqs.SQSKeySample: e.SQSQueueNameSample,
 		},
