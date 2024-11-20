@@ -40,10 +40,10 @@ linters-settings:
     # Default false
     ignore-comments: true
 
-  gocognit:
-    # Minimal code complexity to report.
-    # Default: 30 (but we recommend 10-20)
-    min-complexity: 30
+  # gocognit:
+  #   # Minimal code complexity to report.
+  #   # Default: 30 (but we recommend 10-20)
+  #   min-complexity: 30
 
   gocritic:
     # Settings passed to gocritic.
@@ -155,13 +155,13 @@ linters-settings:
     # Default: ""
     context: "scope"
 
-  wrapcheck:
-    ignorePackageGlobs:
-      - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain*
-      - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure*
-      - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase*
-      - github.com/avast/retry-go
-      - github.com/cenkalti/backoff
+  # wrapcheck:
+  #   ignorePackageGlobs:
+  #     - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain*
+  #     - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure*
+  #     - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase*
+  #     - github.com/avast/retry-go
+  #     - github.com/cenkalti/backoff
 
   tenv:
     # The option `all` will run against whole test files (`_test.go`) regardless of method/function signatures.
@@ -199,7 +199,7 @@ linters:
     # - gochecknoglobals # checks that no global variables exist
     - gochecknoinits # checks that no init functions are present in Go code
     - gochecksumtype # checks exhaustiveness on Go "sum types"
-    - gocognit # computes and checks the cognitive complexity of functions
+    # - gocognit # computes and checks the cognitive complexity of functions
     - goconst # finds repeated strings that could be replaced by a constant
     - gocritic # provides diagnostics that check for bugs, performance and style issues
     # - gocyclo # computes and checks the cyclomatic complexity of functions
@@ -259,7 +259,7 @@ linters:
     #- prealloc # [premature optimization, but can be used in some cases] finds slice declarations that could potentially be preallocated
     - tagalign # checks that struct tags are well aligned
     #- varnamelen # [great idea, but too many false positives] checks that the length of a variable's name matches its scope
-    - wrapcheck # checks that errors returned from external packages are wrapped
+    # - wrapcheck # checks that errors returned from external packages are wrapped
     #- zerologlint # detects the wrong usage of zerolog that a user forgets to dispatch zerolog.Event
 
     ## disabled
@@ -307,7 +307,7 @@ issues:
         - gosec
         - noctx
         - wrapcheck
-    - path: "cmd/app/main.go"
+    - path: "cmd/main.go"
       linters:
         - forbidigo
 

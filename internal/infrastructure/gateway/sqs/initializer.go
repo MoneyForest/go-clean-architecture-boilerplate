@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	awscfg "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/aws"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
@@ -17,10 +17,7 @@ const (
 )
 
 type SQSConfig struct {
-	Environment string
-	Region      string
-	Endpoint    string
-	QueueNames  map[Key]string
+	QueueNames map[Key]string
 }
 
 type SQSClient struct {
@@ -28,55 +25,34 @@ type SQSClient struct {
 	QueueURLs map[Key]string
 }
 
-func InitSQS(ctx context.Context, cfg SQSConfig) (*SQSClient, error) {
-	var options []func(*config.LoadOptions) error
-	options = append(options, config.WithRegion(cfg.Region))
-
-	switch cfg.Environment {
-	case "local", "test":
-		if cfg.Endpoint == "" {
-			return nil, fmt.Errorf("SQS endpoint is required for local/test environment")
-		}
-		options = append(options, config.WithCredentialsProvider(aws.CredentialsProviderFunc(
-			func(ctx context.Context) (aws.Credentials, error) {
-				return aws.Credentials{
-					AccessKeyID:     "dummy",
-					SecretAccessKey: "dummy",
-					SessionToken:    "dummy",
-				}, nil
-			},
-		)))
-		customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-			if service == sqs.ServiceID {
-				return aws.Endpoint{
-					PartitionID:       "aws",
-					URL:               cfg.Endpoint,
-					SigningRegion:     cfg.Region,
-					HostnameImmutable: true,
-				}, nil
-			}
-			return aws.Endpoint{}, fmt.Errorf("unknown service %s", service)
-		})
-		options = append(options, config.WithEndpointResolverWithOptions(customResolver))
-	default:
-		return nil, fmt.Errorf("invalid environment: %s", cfg.Environment)
-	}
-
-	awsCfg, err := config.LoadDefaultConfig(ctx, options...)
+func InitSQS(ctx context.Context, awsCfg awscfg.AWSConfig, cfg SQSConfig) (*SQSClient, error) {
+	awsConfig, err := awscfg.LoadAWSConfig(ctx, awscfg.AWSConfig{
+		Environment: awsCfg.Environment,
+		Region:      awsCfg.Region,
+		Endpoint:    awsCfg.Endpoint,
+	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to load AWS config: %w", err)
+		return nil, err
 	}
 
-	client := sqs.NewFromConfig(awsCfg)
+	client := sqs.NewFromConfig(awsConfig, func(o *sqs.Options) {
+		switch awsCfg.Environment {
+		case "local", "test":
+			o.BaseEndpoint = aws.String(awsCfg.Endpoint)
+		}
+	})
+
 	sqsClient := &SQSClient{
 		Client:    client,
 		QueueURLs: make(map[Key]string),
 	}
 
 	for Key, queueName := range cfg.QueueNames {
-		queueURL := fmt.Sprintf("%s/000000000000/%s", cfg.Endpoint, queueName)
-		if cfg.Environment != "local" && cfg.Environment != "test" {
-			// 本番環境の場合は GetQueueUrl API を使用
+		var queueURL string
+		switch awsCfg.Environment {
+		case "local", "test":
+			queueURL = fmt.Sprintf("%s/000000000000/%s", awsCfg.Endpoint, queueName)
+		default:
 			result, err := client.GetQueueUrl(ctx, &sqs.GetQueueUrlInput{
 				QueueName: aws.String(queueName),
 			})

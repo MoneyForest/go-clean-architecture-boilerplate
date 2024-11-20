@@ -5,7 +5,6 @@ import (
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/dto"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
@@ -55,7 +54,7 @@ func (r SQSRepository) ReceiveMessage(ctx context.Context, opts *ReceiveMessageO
 
 	if len(opts.AttributeNames) > 0 {
 		for _, attr := range opts.AttributeNames {
-			input.AttributeNames = append(input.AttributeNames, types.QueueAttributeName(attr))
+			input.MessageSystemAttributeNames = append(input.MessageSystemAttributeNames, types.MessageSystemAttributeName(attr))
 		}
 	}
 

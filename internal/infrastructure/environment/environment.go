@@ -23,7 +23,7 @@ type RedisEnvironment struct {
 }
 
 type SQSEnvironment struct {
-	AWSRegion          string `env:"AWS_REGION"              envDefault:"ap-northeast-1"`
-	AWSEndpoint        string `env:"AWS_ENDPOINT"            envDefault:"http://localhost:4566"`
-	SQSQueueNameSample string `env:"SQS_QUEUE_NAME_SAMPLE" required:"true"`
+	AWSRegion          string `env:"AWS_REGION,required"`
+	AWSEndpoint        string `env:"AWS_ENDPOINT,required"`
+	SQSQueueNameSample string `env:"SQS_QUEUE_NAME_SAMPLE,required"`
 }

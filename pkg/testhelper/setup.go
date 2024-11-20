@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/aws"
 	mysqlgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql"
 	redisgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis"
 	sqsgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
@@ -67,11 +68,12 @@ func Setup(ctx context.Context) (*Gateway, error) {
 	if err != nil {
 		return nil, err
 	}
-	sqsClient, err := sqsgw.InitSQS(ctx, sqsgw.SQSConfig{
+	sqsClient, err := sqsgw.InitSQS(ctx, aws.AWSConfig{
 		Environment: e.Environment,
 		Region:      e.AWSRegion,
 		Endpoint:    e.AWSEndpoint,
-		QueueNames:  map[sqsgw.Key]string{sqsgw.SQSKeySample: e.SQSQueueNameSample},
+	}, sqsgw.SQSConfig{
+		QueueNames: map[sqsgw.Key]string{sqsgw.SQSKeySample: e.SQSQueueNameSample},
 	})
 	if err != nil {
 		return nil, err
