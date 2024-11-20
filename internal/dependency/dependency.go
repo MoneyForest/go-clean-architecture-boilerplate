@@ -75,6 +75,7 @@ func Inject(ctx context.Context) (*Dependency, error) {
 	// Initialize interactor
 	userInteractor := interactor.NewUserInteractor(mysqlUserRepository, redisUserRepository, sqsUserRepository)
 	matchInteractor := interactor.NewMatchInteractor(mysqlMatchRepository, matchingDomainService)
+
 	return &Dependency{
 		Environment:     e,
 		UserInteractor:  userInteractor,
