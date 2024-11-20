@@ -10,16 +10,18 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/service"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/transaction"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/testhelper"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
 func SetupTestMatchingInteractor(ctx context.Context, gw *testhelper.Gateway) (MatchingInteractor, *repository.UserMySQLRepository) {
-	matchingRepo := repository.NewMatchingMySQLRepository(gw.MySQLClient) // ポインタを返すように &を追加
+	txManager := transaction.NewSQLTransaction(gw.MySQLClient)
+	matchingRepo := repository.NewMatchingMySQLRepository(gw.MySQLClient)
 	userRepo := repository.NewUserMySQLRepository(gw.MySQLClient)
 	ds := service.NewMatchingDomainService(userRepo, matchingRepo)
-	return NewMatchingInteractor(matchingRepo, ds), &userRepo
+	return NewMatchingInteractor(txManager, matchingRepo, ds), &userRepo
 }
 
 func createTestUser(ctx context.Context, t *testing.T, userRepo *repository.UserMySQLRepository) *model.User {
