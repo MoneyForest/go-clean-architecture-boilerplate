@@ -15,12 +15,14 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/http/middleware"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func Run() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3000*time.Second)
 	defer cancel()
 
+	// Inject dependencies
 	dependency, err := dependency.Inject(ctx)
 	if err != nil {
 		return err
@@ -28,20 +30,26 @@ func Run() error {
 
 	r := chi.NewRouter()
 
-	// ミドルウェアの設定
+	// Set up middleware
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recover)
 	r.Use(chimiddleware.RequestID)
 	r.Use(chimiddleware.RealIP)
 	r.Use(chimiddleware.Timeout(60 * time.Second))
 
-	// ハンドラーの初期化
+	// Initialize handlers
 	userHandler := &handler.UserHandler{
 		UserInteractor: dependency.UserInteractor,
 	}
 	healthHandler := &handler.HealthHandler{}
 
-	// ルーティングの設定
+	// Route for swagger UI
+	// http://localhost:8080/swagger/index.html
+	r.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("/swagger/doc.json"),
+	))
+
+	// Set up API routes
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Route("/users", func(r chi.Router) {
 			r.Get("/", userHandler.List)
