@@ -71,7 +71,7 @@ func TestUserInteractor_Create(t *testing.T) {
 				cmpopts.IgnoreFields(model.User{}, "ID", "CreatedAt", "UpdatedAt"),
 			)
 			if diff != "" {
-				t.Errorf("Create() mismatch (-want +got):\n%s", diff)
+				t.Errorf("Create() mismatching (-want +got):\n%s", diff)
 			}
 		})
 	}
@@ -126,7 +126,7 @@ func TestUserInteractor_Get(t *testing.T) {
 			}
 			diff := cmp.Diff(got.User, tt.want)
 			if diff != "" {
-				t.Errorf("Get() mismatch (-want +got):\n%s", diff)
+				t.Errorf("Get() mismatching (-want +got):\n%s", diff)
 			}
 		})
 	}

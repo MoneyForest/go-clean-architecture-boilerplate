@@ -39,7 +39,7 @@ func TestNewUser(t *testing.T) {
 				cmpopts.IgnoreFields(User{}, "ID", "CreatedAt", "UpdatedAt"),
 			)
 			if diff != "" {
-				t.Errorf("NewUser() mismatch (-got +want):\n%s", diff)
+				t.Errorf("NewUser() mismatching (-got +want):\n%s", diff)
 			}
 
 			now := time.Now()

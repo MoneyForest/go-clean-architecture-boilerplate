@@ -10,39 +10,39 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
-type MatchMySQLRepository struct {
+type MatchingMySQLRepository struct {
 	db *sql.DB
 }
 
-func NewMatchMySQLRepository(db *sql.DB) MatchMySQLRepository {
-	return MatchMySQLRepository{db: db}
+func NewMatchingMySQLRepository(db *sql.DB) MatchingMySQLRepository {
+	return MatchingMySQLRepository{db: db}
 }
 
-func (r MatchMySQLRepository) BeginTx(ctx context.Context) (*sql.Tx, error) {
+func (r MatchingMySQLRepository) BeginTx(ctx context.Context) (*sql.Tx, error) {
 	return r.db.BeginTx(ctx, nil)
 }
 
-func (r MatchMySQLRepository) CreateTx(ctx context.Context, tx *sql.Tx, match *model.Match) (*model.Match, error) {
+func (r MatchingMySQLRepository) CreateTx(ctx context.Context, tx *sql.Tx, matching *model.Matching) (*model.Matching, error) {
 	query := `INSERT INTO matching (id, me_id, partner_id, status, created_at, updated_at)
               VALUES (?, ?, ?, ?, ?, ?)`
 
 	_, err := tx.ExecContext(ctx, query,
-		match.ID, match.MeID, match.PartnerID,
-		match.Status, match.CreatedAt, match.UpdatedAt)
+		matching.ID, matching.MeID, matching.PartnerID,
+		matching.Status, matching.CreatedAt, matching.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
 
-	return match, nil
+	return matching, nil
 }
 
-func (r MatchMySQLRepository) List(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*model.Match, error) {
+func (r MatchingMySQLRepository) List(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*model.Matching, error) {
 	query := `SELECT id, me_id, partner_id, status, created_at, updated_at
               FROM matching
               WHERE me_id = ? OR partner_id = ?
               LIMIT ? OFFSET ?`
 
-	var entities []*entity.MatchEntity
+	var entities []*entity.MatchingEntity
 	rows, err := r.db.QueryContext(ctx, query, userID, userID, limit, offset)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (r MatchMySQLRepository) List(ctx context.Context, userID uuid.UUID, limit,
 	defer rows.Close()
 
 	for rows.Next() {
-		var entity entity.MatchEntity
+		var entity entity.MatchingEntity
 		if err := rows.Scan(
 			&entity.ID,
 			&entity.MeID,
@@ -68,15 +68,15 @@ func (r MatchMySQLRepository) List(ctx context.Context, userID uuid.UUID, limit,
 		return nil, err
 	}
 
-	return dto.ToMatchModels(entities)
+	return dto.ToMatchingModels(entities)
 }
 
-func (r MatchMySQLRepository) Get(ctx context.Context, id uuid.UUID) (*model.Match, error) {
+func (r MatchingMySQLRepository) Get(ctx context.Context, id uuid.UUID) (*model.Matching, error) {
 	query := `SELECT id, me_id, partner_id, status, created_at, updated_at
               FROM matching
               WHERE id = ?`
 
-	var entity entity.MatchEntity
+	var entity entity.MatchingEntity
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
 		&entity.ID,
 		&entity.MeID,
@@ -89,23 +89,23 @@ func (r MatchMySQLRepository) Get(ctx context.Context, id uuid.UUID) (*model.Mat
 		return nil, err
 	}
 
-	return dto.ToMatchModel(&entity)
+	return dto.ToMatchingModel(&entity)
 }
 
-func (r MatchMySQLRepository) UpdateTx(ctx context.Context, tx *sql.Tx, match *model.Match) (*model.Match, error) {
+func (r MatchingMySQLRepository) UpdateTx(ctx context.Context, tx *sql.Tx, matching *model.Matching) (*model.Matching, error) {
 	query := `UPDATE matching
               SET status = ?, updated_at = NOW()
               WHERE id = ?`
 
-	_, err := tx.ExecContext(ctx, query, match.Status, match.ID)
+	_, err := tx.ExecContext(ctx, query, matching.Status, matching.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	return match, nil
+	return matching, nil
 }
 
-func (r MatchMySQLRepository) DeleteTx(ctx context.Context, tx *sql.Tx, id uuid.UUID) (*uuid.UUID, error) {
+func (r MatchingMySQLRepository) DeleteTx(ctx context.Context, tx *sql.Tx, id uuid.UUID) (*uuid.UUID, error) {
 	query := `DELETE FROM matching WHERE id = ?`
 
 	_, err := tx.ExecContext(ctx, query, id)

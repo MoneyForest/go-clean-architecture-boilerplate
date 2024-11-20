@@ -8,25 +8,25 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
-func ToMatchModel(entity *entity.MatchEntity) (*model.Match, error) {
+func ToMatchingModel(entity *entity.MatchingEntity) (*model.Matching, error) {
 	if !uuid.IsValidUUIDv7(entity.ID) {
 		return nil, errors.New("invalid UUIDv7 format")
 	}
 
-	return &model.Match{
+	return &model.Matching{
 		ID:        uuid.MustParse(entity.ID),
 		MeID:      uuid.MustParse(entity.MeID),
 		PartnerID: uuid.MustParse(entity.PartnerID),
-		Status:    model.MatchStatus(entity.Status),
+		Status:    model.MatchingStatus(entity.Status),
 		CreatedAt: entity.CreatedAt,
 		UpdatedAt: entity.UpdatedAt,
 	}, nil
 }
 
-func ToMatchModels(entities []*entity.MatchEntity) ([]*model.Match, error) {
-	var users []*model.Match
+func ToMatchingModels(entities []*entity.MatchingEntity) ([]*model.Matching, error) {
+	var users []*model.Matching
 	for _, entity := range entities {
-		user, err := ToMatchModel(entity)
+		user, err := ToMatchingModel(entity)
 		if err != nil {
 			return nil, err
 		}
@@ -35,8 +35,8 @@ func ToMatchModels(entities []*entity.MatchEntity) ([]*model.Match, error) {
 	return users, nil
 }
 
-func ToMatchEntity(model *model.Match) *entity.MatchEntity {
-	return &entity.MatchEntity{
+func ToMatchingEntity(model *model.Matching) *entity.MatchingEntity {
+	return &entity.MatchingEntity{
 		ID:        model.ID.String(),
 		MeID:      model.MeID.String(),
 		PartnerID: model.PartnerID.String(),
@@ -46,10 +46,10 @@ func ToMatchEntity(model *model.Match) *entity.MatchEntity {
 	}
 }
 
-func ToMatchEntities(models []*model.Match) []*entity.MatchEntity {
-	var entities []*entity.MatchEntity
+func ToMatchingEntities(models []*model.Matching) []*entity.MatchingEntity {
+	var entities []*entity.MatchingEntity
 	for _, model := range models {
-		entities = append(entities, ToMatchEntity(model))
+		entities = append(entities, ToMatchingEntity(model))
 	}
 	return entities
 }
