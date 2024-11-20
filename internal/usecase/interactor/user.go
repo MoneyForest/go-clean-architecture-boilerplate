@@ -97,25 +97,15 @@ func (i *userInteractor) Update(ctx context.Context, input *input.UpdateUserInpu
 		return nil, err
 	}
 
-	tx, err := i.repo.BeginTx(ctx)
+	var updatedUser *model.User
+	err := i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+		var err error
+		updatedUser, err = i.repo.Update(ctx, user)
+		return err
+	})
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			log.Printf("failed to rollback transaction: %v\n", err)
-		}
-	}()
-
-	updatedUser, err := i.repo.UpdateTx(ctx, tx, user)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
 	if err := i.cache.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
 		log.Printf("failed to set cache: %v\n", err)
 	}
@@ -123,25 +113,15 @@ func (i *userInteractor) Update(ctx context.Context, input *input.UpdateUserInpu
 }
 
 func (i *userInteractor) Delete(ctx context.Context, input *input.DeleteUserInput) (*output.DeleteUserOutput, error) {
-	tx, err := i.repo.BeginTx(ctx)
+	var deletedID *uuid.UUID
+	err := i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+		var err error
+		deletedID, err = i.repo.Delete(ctx, input.ID)
+		return err
+	})
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			log.Printf("failed to rollback transaction: %v\n", err)
-		}
-	}()
-
-	deletedID, err := i.repo.DeleteTx(ctx, tx, input.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
 	if err := i.cache.Delete(ctx, input.ID); err != nil {
 		log.Printf("failed to delete cache: %v\n", err)
 	}
