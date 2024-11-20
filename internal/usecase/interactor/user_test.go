@@ -10,6 +10,7 @@ import (
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/transaction"
 	redisRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
 	sqsRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/repository"
@@ -20,6 +21,7 @@ import (
 
 func SetupTestUserInteractor(ctx context.Context, gw *testhelper.Gateway) UserInteractor {
 	return NewUserInteractor(
+		transaction.NewSQLTransaction(gw.MySQLClient),
 		repository.NewUserMySQLRepository(gw.MySQLClient),
 		redisRepo.NewUserRedisRepository(gw.RedisClient),
 		sqsRepo.NewSQSRepository(gw.SQSClient.Client, gw.SQSClient.QueueURLs[sqs.SQSKeySample]),

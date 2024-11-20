@@ -22,10 +22,10 @@ func (r UserMySQLRepository) BeginTx(ctx context.Context) (*sql.Tx, error) {
 	return r.db.BeginTx(ctx, nil)
 }
 
-func (r UserMySQLRepository) CreateTx(ctx context.Context, tx *sql.Tx, user *model.User) (*model.User, error) {
+func (r UserMySQLRepository) Create(ctx context.Context, user *model.User) (*model.User, error) {
 	query := `INSERT INTO user (id, email, created_at, updated_at) VALUES (?, ?, ?, ?)`
 
-	_, err := tx.ExecContext(ctx, query, user.ID, user.Email, user.CreatedAt, user.UpdatedAt)
+	_, err := r.db.ExecContext(ctx, query, user.ID, user.Email, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}

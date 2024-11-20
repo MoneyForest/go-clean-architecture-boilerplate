@@ -28,22 +28,10 @@ func createTestUser(ctx context.Context, t *testing.T, userRepo *repository.User
 		ID:    ID,
 		Email: ID.String() + "@example.com",
 	})
-	tx, err := userRepo.BeginTx(ctx)
+	createdUser, err := userRepo.Create(ctx, user)
 	if err != nil {
-		t.Fatalf("Failed to begin tx: %v", err)
-	}
-
-	createdUser, err := userRepo.CreateTx(ctx, tx, user)
-	if err != nil {
-		tx.Rollback()
 		t.Fatalf("Failed to create test user: %v", err)
 	}
-
-	if err := tx.Commit(); err != nil {
-		tx.Rollback()
-		t.Fatalf("Failed to commit tx: %v", err)
-	}
-
 	return createdUser
 }
 

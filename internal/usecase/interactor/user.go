@@ -24,16 +24,23 @@ type UserInteractor interface {
 }
 
 type userInteractor struct {
-	repo     repository.UserRepository
-	cache    repository.UserCacheRepository
-	msgQueue repository.UserMessageQueueRepository
+	txManager repository.Transaction
+	repo      repository.UserRepository
+	cache     repository.UserCacheRepository
+	msgQueue  repository.UserMessageQueueRepository
 }
 
-func NewUserInteractor(repo repository.UserRepository, cache repository.UserCacheRepository, msgQueue repository.UserMessageQueueRepository) UserInteractor {
+func NewUserInteractor(
+	txManager repository.Transaction,
+	repo repository.UserRepository,
+	cache repository.UserCacheRepository,
+	msgQueue repository.UserMessageQueueRepository,
+) UserInteractor {
 	return &userInteractor{
-		repo:     repo,
-		cache:    cache,
-		msgQueue: msgQueue,
+		repo:      repo,
+		cache:     cache,
+		msgQueue:  msgQueue,
+		txManager: txManager,
 	}
 }
 
@@ -43,28 +50,20 @@ func (i *userInteractor) Create(ctx context.Context, input *input.CreateUserInpu
 		return nil, err
 	}
 
-	tx, err := i.repo.BeginTx(ctx)
+	var createdUser *model.User
+	err := i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+		var err error
+		createdUser, err = i.repo.Create(ctx, user)
+		return err
+	})
 	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			log.Printf("failed to rollback transaction: %v\n", err)
-		}
-	}()
-
-	createdUser, err := i.repo.CreateTx(ctx, tx, user)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 
 	if err := i.cache.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
 		log.Printf("failed to set cache: %v\n", err)
 	}
+
 	return &output.CreateUserOutput{User: createdUser}, nil
 }
 
