@@ -10,30 +10,33 @@ It puts the business logic at the center and protects it from the details of ext
 ### Layer Structure
 
 ```mermaid
-graph TD
+%%{init: {"flowchart": {"htmlLabels": true}} }%%
+graph LR
     subgraph External["External Interfaces"]
         HTTP["HTTP"]
         DB["MySQL"]
         CACHE["Redis"]
+        SQS["AWS SQS"]
     end
 
     subgraph Infrastructure["Infrastructure Layer"]
         subgraph Controller["Controller"]
             H["Handler"]
         end
-
         subgraph Gateway["Gateway"]
             MR["MySQL Repository"]
             RR["Redis Repository"]
+            SR["SQS Repository"]
         end
     end
 
     subgraph Usecase["Usecase Layer"]
-        U["Interactor"]
+        I["Interactor"]
     end
 
     subgraph Domain["Domain Layer"]
         DM["Domain Model"]
+        DS["Domain Service"]
         RI["Repository Interface"]
     end
 
@@ -41,17 +44,20 @@ graph TD
     HTTP --> H
     MR --> DB
     RR --> CACHE
+    SR --> SQS
 
     %% Controller → Usecase
-    H --> U
+    H --> I
 
     %% Usecase → Domain
-    U --> DM
-    U --> RI
+    I --> DM
+    I --> DS
+    I --> RI
+    DS --> DM
+    DS --> RI
 
-    %% Repository uses Gateways
-    U --> MR
-    U --> RR
+    %% Repository Implementations
+    Gateway --> RI
 
     classDef domain fill:#e8372c,stroke:#333,stroke-width:2px,color:#fff
     classDef usecase fill:#f58634,stroke:#333,stroke-width:2px,color:#fff
