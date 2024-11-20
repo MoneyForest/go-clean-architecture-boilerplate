@@ -64,7 +64,7 @@ jobs:
         run: go mod download
       - name: Check swag generation
         run: |
-          make swag
+          make swagger-gen
           if [ -n "$(git status --porcelain)" ]; then
             echo "Detected uncommitted changes after swag generation"
             git status
