@@ -140,7 +140,7 @@ func TestUserInteractor_List(t *testing.T) {
 	defer testhelper.Cleanup(ctx, gw)
 	userInteractor := SetupTestUserInteractor(ctx, gw)
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		_, err := userInteractor.Create(ctx, &input.CreateUserInput{
 			Email: fmt.Sprintf("test%d@example.com", i),
 		})

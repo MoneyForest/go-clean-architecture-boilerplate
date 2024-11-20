@@ -54,7 +54,7 @@ func (r SQSRepository) ReceiveMessage(ctx context.Context, opts *ReceiveMessageO
 
 	if len(opts.AttributeNames) > 0 {
 		for _, attr := range opts.AttributeNames {
-			input.AttributeNames = append(input.AttributeNames, types.QueueAttributeName(attr))
+			input.MessageSystemAttributeNames = append(input.MessageSystemAttributeNames, types.MessageSystemAttributeName(attr))
 		}
 	}
 

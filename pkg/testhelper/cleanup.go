@@ -37,6 +37,9 @@ func cleanupMySQL(_ context.Context, g *Gateway) {
 			log.Printf("failed to truncate table %s: %v", tableName, err)
 		}
 	}
+	if err := rows.Err(); err != nil {
+		log.Printf("error occurred while iterating over tables: %v", err)
+	}
 	if _, err := g.MySQLClient.Exec("SET FOREIGN_KEY_CHECKS = 1"); err != nil {
 		log.Printf("failed to enable foreign key checks: %v", err)
 	}

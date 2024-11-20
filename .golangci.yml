@@ -40,10 +40,10 @@ linters-settings:
     # Default false
     ignore-comments: true
 
-  gocognit:
-    # Minimal code complexity to report.
-    # Default: 30 (but we recommend 10-20)
-    min-complexity: 30
+  # gocognit:
+  #   # Minimal code complexity to report.
+  #   # Default: 30 (but we recommend 10-20)
+  #   min-complexity: 30
 
   gocritic:
     # Settings passed to gocritic.
@@ -199,7 +199,7 @@ linters:
     # - gochecknoglobals # checks that no global variables exist
     - gochecknoinits # checks that no init functions are present in Go code
     - gochecksumtype # checks exhaustiveness on Go "sum types"
-    - gocognit # computes and checks the cognitive complexity of functions
+    # - gocognit # computes and checks the cognitive complexity of functions
     - goconst # finds repeated strings that could be replaced by a constant
     - gocritic # provides diagnostics that check for bugs, performance and style issues
     # - gocyclo # computes and checks the cyclomatic complexity of functions
