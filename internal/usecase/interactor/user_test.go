@@ -21,7 +21,7 @@ import (
 
 func SetupTestUserInteractor(ctx context.Context, gw *testhelper.Gateway) UserInteractor {
 	return NewUserInteractor(
-		transaction.NewSQLTransaction(gw.MySQLClient),
+		transaction.NewMySQLTransactionManager(gw.MySQLClient),
 		repository.NewUserMySQLRepository(gw.MySQLClient),
 		redisRepo.NewUserRedisRepository(gw.RedisClient),
 		sqsRepo.NewSQSRepository(gw.SQSClient.Client, gw.SQSClient.QueueURLs[sqs.SQSKeySample]),

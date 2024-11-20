@@ -6,19 +6,19 @@ import (
 	"log"
 )
 
-type Transaction interface {
+type MySQLTransactionManager interface {
 	DoInTx(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
-type SQLTransaction struct {
+type mysqlTransactionManager struct {
 	db *sql.DB
 }
 
-func NewSQLTransaction(db *sql.DB) Transaction {
-	return &SQLTransaction{db: db}
+func NewMySQLTransactionManager(db *sql.DB) MySQLTransactionManager {
+	return &mysqlTransactionManager{db: db}
 }
 
-func (t *SQLTransaction) DoInTx(ctx context.Context, fn func(ctx context.Context) error) error {
+func (t *mysqlTransactionManager) DoInTx(ctx context.Context, fn func(ctx context.Context) error) error {
 	tx, err := t.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err

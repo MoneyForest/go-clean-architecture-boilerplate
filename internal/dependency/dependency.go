@@ -65,7 +65,7 @@ func Inject(ctx context.Context) (*Dependency, error) {
 	}
 
 	// Initialize transaction manager
-	txManager := transaction.NewSQLTransaction(mysqlClient)
+	mysqlTxManager := transaction.NewMySQLTransactionManager(mysqlClient)
 
 	// Initialize repositories
 	mysqlUserRepository := mysqlRepo.NewUserMySQLRepository(mysqlClient)
@@ -78,8 +78,8 @@ func Inject(ctx context.Context) (*Dependency, error) {
 	matchingDomainService := service.NewMatchingDomainService(mysqlUserRepository, mysqlMatchingRepository)
 
 	// Initialize interactor
-	userInteractor := interactor.NewUserInteractor(txManager, mysqlUserRepository, redisUserRepository, sqsUserRepository)
-	matchingInteractor := interactor.NewMatchingInteractor(txManager, mysqlMatchingRepository, matchingDomainService)
+	userInteractor := interactor.NewUserInteractor(mysqlTxManager, mysqlUserRepository, redisUserRepository, sqsUserRepository)
+	matchingInteractor := interactor.NewMatchingInteractor(mysqlTxManager, mysqlMatchingRepository, matchingDomainService)
 
 	return &Dependency{
 		Environment:        e,

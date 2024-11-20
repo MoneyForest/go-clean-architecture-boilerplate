@@ -17,7 +17,7 @@ import (
 )
 
 func SetupTestMatchingInteractor(ctx context.Context, gw *testhelper.Gateway) (MatchingInteractor, *repository.UserMySQLRepository) {
-	txManager := transaction.NewSQLTransaction(gw.MySQLClient)
+	txManager := transaction.NewMySQLTransactionManager(gw.MySQLClient)
 	matchingRepo := repository.NewMatchingMySQLRepository(gw.MySQLClient)
 	userRepo := repository.NewUserMySQLRepository(gw.MySQLClient)
 	ds := service.NewMatchingDomainService(userRepo, matchingRepo)
