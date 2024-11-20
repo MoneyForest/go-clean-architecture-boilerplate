@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/repository"
 	mysql "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
 	redis "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
@@ -26,7 +27,7 @@ type UserInteractor interface {
 }
 
 type userInteractor struct {
-	mysql mysql.UserMySQLRepository
+	mysql repository.UserRepository
 	redis redis.UserRedisRepository
 	sqs   sqs.SQSRepository
 }
