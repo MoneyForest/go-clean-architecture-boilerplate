@@ -117,6 +117,7 @@ graph TD
 │   │   ├── gateway
 │   │   │   ├── mysql
 │   │   │   └── redis
+│   │   │
 │   │   └── environment
 │   │
 │   └── dependency

@@ -55,6 +55,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install swag
         run: go install github.com/swaggo/swag/cmd/swag@latest
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ./go.mod
+          cache: true
+      - name: mod download
+        run: go mod download
       - name: Check swag generation
         run: |
           make swag
