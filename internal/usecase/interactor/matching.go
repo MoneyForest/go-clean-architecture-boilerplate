@@ -7,7 +7,7 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/service"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/transaction"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/transaction"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/output"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
@@ -22,12 +22,12 @@ type MatchingInteractor interface {
 }
 
 type matchingInteractor struct {
-	txManager transaction.Transaction
+	txManager transaction.Manager
 	repo      repository.MatchingRepository
 	service   *service.MatchingDomainService
 }
 
-func NewMatchingInteractor(txManager transaction.Transaction, repo repository.MatchingRepository, ds *service.MatchingDomainService) MatchingInteractor {
+func NewMatchingInteractor(txManager transaction.Manager, repo repository.MatchingRepository, ds *service.MatchingDomainService) MatchingInteractor {
 	return &matchingInteractor{
 		txManager: txManager,
 		repo:      repo,
