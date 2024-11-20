@@ -35,16 +35,24 @@ func InitSQS(ctx context.Context, awsCfg awscfg.AWSConfig, cfg SQSConfig) (*SQSC
 		return nil, err
 	}
 
-	client := sqs.NewFromConfig(awsConfig)
+	client := sqs.NewFromConfig(awsConfig, func(o *sqs.Options) {
+		switch awsCfg.Environment {
+		case "local", "test":
+			o.BaseEndpoint = aws.String(awsCfg.Endpoint)
+		}
+	})
+
 	sqsClient := &SQSClient{
 		Client:    client,
 		QueueURLs: make(map[Key]string),
 	}
 
 	for Key, queueName := range cfg.QueueNames {
-		queueURL := fmt.Sprintf("%s/000000000000/%s", awsCfg.Endpoint, queueName)
-		if awsCfg.Environment != "local" && awsCfg.Environment != "test" {
-			// 本番環境の場合は GetQueueUrl API を使用
+		var queueURL string
+		switch awsCfg.Environment {
+		case "local", "test":
+			queueURL = fmt.Sprintf("%s/000000000000/%s", awsCfg.Endpoint, queueName)
+		default:
 			result, err := client.GetQueueUrl(ctx, &sqs.GetQueueUrlInput{
 				QueueName: aws.String(queueName),
 			})

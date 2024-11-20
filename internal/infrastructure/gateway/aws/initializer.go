@@ -21,7 +21,7 @@ func LoadAWSConfig(ctx context.Context, cfg AWSConfig) (aws.Config, error) {
 	switch cfg.Environment {
 	case "local", "test":
 		if cfg.Endpoint == "" {
-			return aws.Config{}, fmt.Errorf("SQS endpoint is required for local/test environment")
+			return aws.Config{}, fmt.Errorf("endpoint is required for local/test environment")
 		}
 		options = append(options, config.WithCredentialsProvider(aws.CredentialsProviderFunc(
 			func(ctx context.Context) (aws.Credentials, error) {
