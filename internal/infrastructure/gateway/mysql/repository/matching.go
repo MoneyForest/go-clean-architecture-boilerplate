@@ -18,15 +18,11 @@ func NewMatchingMySQLRepository(db *sql.DB) MatchingMySQLRepository {
 	return MatchingMySQLRepository{db: db}
 }
 
-func (r MatchingMySQLRepository) BeginTx(ctx context.Context) (*sql.Tx, error) {
-	return r.db.BeginTx(ctx, nil)
-}
-
-func (r MatchingMySQLRepository) CreateTx(ctx context.Context, tx *sql.Tx, matching *model.Matching) (*model.Matching, error) {
+func (r MatchingMySQLRepository) Create(ctx context.Context, matching *model.Matching) (*model.Matching, error) {
 	query := `INSERT INTO matching (id, me_id, partner_id, status, created_at, updated_at)
               VALUES (?, ?, ?, ?, ?, ?)`
 
-	_, err := tx.ExecContext(ctx, query,
+	_, err := r.db.ExecContext(ctx, query,
 		matching.ID, matching.MeID, matching.PartnerID,
 		matching.Status, matching.CreatedAt, matching.UpdatedAt)
 	if err != nil {
@@ -92,12 +88,12 @@ func (r MatchingMySQLRepository) Get(ctx context.Context, id uuid.UUID) (*model.
 	return dto.ToMatchingModel(&entity)
 }
 
-func (r MatchingMySQLRepository) UpdateTx(ctx context.Context, tx *sql.Tx, matching *model.Matching) (*model.Matching, error) {
+func (r MatchingMySQLRepository) Update(ctx context.Context, matching *model.Matching) (*model.Matching, error) {
 	query := `UPDATE matching
               SET status = ?, updated_at = NOW()
               WHERE id = ?`
 
-	_, err := tx.ExecContext(ctx, query, matching.Status, matching.ID)
+	_, err := r.db.ExecContext(ctx, query, matching.Status, matching.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -105,10 +101,10 @@ func (r MatchingMySQLRepository) UpdateTx(ctx context.Context, tx *sql.Tx, match
 	return matching, nil
 }
 
-func (r MatchingMySQLRepository) DeleteTx(ctx context.Context, tx *sql.Tx, id uuid.UUID) (*uuid.UUID, error) {
+func (r MatchingMySQLRepository) Delete(ctx context.Context, id uuid.UUID) (*uuid.UUID, error) {
 	query := `DELETE FROM matching WHERE id = ?`
 
-	_, err := tx.ExecContext(ctx, query, id)
+	_, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
 		return nil, err
 	}

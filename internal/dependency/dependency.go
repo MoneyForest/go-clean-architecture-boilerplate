@@ -11,6 +11,7 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/aws"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql"
 	mysqlRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/transaction"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis"
 	redisRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
@@ -63,6 +64,9 @@ func Inject(ctx context.Context) (*Dependency, error) {
 		return nil, err
 	}
 
+	// Initialize transaction manager
+	mysqlTxManager := transaction.NewMySQLTransactionManager(mysqlClient)
+
 	// Initialize repositories
 	mysqlUserRepository := mysqlRepo.NewUserMySQLRepository(mysqlClient)
 	redisUserRepository := redisRepo.NewUserRedisRepository(redisClient)
@@ -74,8 +78,8 @@ func Inject(ctx context.Context) (*Dependency, error) {
 	matchingDomainService := service.NewMatchingDomainService(mysqlUserRepository, mysqlMatchingRepository)
 
 	// Initialize interactor
-	userInteractor := interactor.NewUserInteractor(mysqlUserRepository, redisUserRepository, sqsUserRepository)
-	matchingInteractor := interactor.NewMatchingInteractor(mysqlMatchingRepository, matchingDomainService)
+	userInteractor := interactor.NewUserInteractor(mysqlTxManager, mysqlUserRepository, redisUserRepository, sqsUserRepository)
+	matchingInteractor := interactor.NewMatchingInteractor(mysqlTxManager, mysqlMatchingRepository, matchingDomainService)
 
 	return &Dependency{
 		Environment:        e,

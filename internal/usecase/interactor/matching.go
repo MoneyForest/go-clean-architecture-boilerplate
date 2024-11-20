@@ -2,14 +2,15 @@ package interactor
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/service"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/transaction"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/output"
+	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
 type MatchingInteractor interface {
@@ -21,43 +22,33 @@ type MatchingInteractor interface {
 }
 
 type matchingInteractor struct {
-	repo    repository.MatchingRepository
-	service *service.MatchingDomainService
+	txManager transaction.Manager
+	repo      repository.MatchingRepository
+	service   *service.MatchingDomainService
 }
 
-func NewMatchingInteractor(repo repository.MatchingRepository, ds *service.MatchingDomainService) MatchingInteractor {
+func NewMatchingInteractor(txManager transaction.Manager, repo repository.MatchingRepository, ds *service.MatchingDomainService) MatchingInteractor {
 	return &matchingInteractor{
-		repo:    repo,
-		service: ds,
+		txManager: txManager,
+		repo:      repo,
+		service:   ds,
 	}
 }
 
 func (i *matchingInteractor) Create(ctx context.Context, input *input.CreateMatchingInput) (*output.CreateMatchingOutput, error) {
-	tx, err := i.repo.BeginTx(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	matching, err := i.service.CreateMatching(ctx, input.MeID, input.PartnerID)
 	if err != nil {
 		return nil, err
 	}
-
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			log.Printf("failed to rollback transaction: %v\n", err)
-		}
-	}()
-
-	createdMatching, err := i.repo.CreateTx(ctx, tx, matching)
+	var createdMatching *model.Matching
+	err = i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+		var err error
+		createdMatching, err = i.repo.Create(ctx, matching)
+		return err
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
 	return &output.CreateMatchingOutput{Matching: createdMatching}, nil
 }
 
@@ -79,55 +70,34 @@ func (i *matchingInteractor) List(ctx context.Context, input *input.ListMatching
 }
 
 func (i *matchingInteractor) Update(ctx context.Context, input *input.UpdateMatchingInput) (*output.UpdateMatchingOutput, error) {
-	matching, err := i.repo.Get(ctx, input.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	matching.Status = model.MatchingStatus(input.Status)
-	matching.UpdatedAt = time.Now()
-
-	tx, err := i.repo.BeginTx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			log.Printf("failed to rollback transaction: %v\n", err)
+	var updatedMatching *model.Matching
+	err := i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+		matching, err := i.repo.Get(ctx, input.ID)
+		if err != nil {
+			return err
 		}
-	}()
 
-	updatedMatching, err := i.repo.UpdateTx(ctx, tx, matching)
+		matching.Status = model.MatchingStatus(input.Status)
+		matching.UpdatedAt = time.Now()
+
+		updatedMatching, err = i.repo.Update(ctx, matching)
+		return err
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
 	return &output.UpdateMatchingOutput{Matching: updatedMatching}, nil
 }
 
 func (i *matchingInteractor) Delete(ctx context.Context, input *input.DeleteMatchingInput) (*output.DeleteMatchingOutput, error) {
-	tx, err := i.repo.BeginTx(ctx)
+	var deletedID *uuid.UUID
+	err := i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+		var err error
+		deletedID, err = i.repo.Delete(ctx, input.ID)
+		return err
+	})
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			log.Printf("failed to rollback transaction: %v\n", err)
-		}
-	}()
-
-	deletedID, err := i.repo.DeleteTx(ctx, tx, input.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
 	return &output.DeleteMatchingOutput{ID: deletedID}, nil
 }
