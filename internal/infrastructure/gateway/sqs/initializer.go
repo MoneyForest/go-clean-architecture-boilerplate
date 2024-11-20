@@ -46,18 +46,6 @@ func InitSQS(ctx context.Context, cfg SQSConfig) (*SQSClient, error) {
 				}, nil
 			},
 		)))
-		customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-			if service == sqs.ServiceID {
-				return aws.Endpoint{
-					PartitionID:       "aws",
-					URL:               cfg.Endpoint,
-					SigningRegion:     cfg.Region,
-					HostnameImmutable: true,
-				}, nil
-			}
-			return aws.Endpoint{}, fmt.Errorf("unknown service %s", service)
-		})
-		options = append(options, config.WithEndpointResolverWithOptions(customResolver))
 	default:
 		return nil, fmt.Errorf("invalid environment: %s", cfg.Environment)
 	}
