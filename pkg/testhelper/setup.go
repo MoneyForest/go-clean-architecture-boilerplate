@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/aws"
 	mysqlgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql"
 	redisgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis"
 	sqsgw "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
-	"github.com/redis/go-redis/v9"
 )
 
 type Gateway struct {

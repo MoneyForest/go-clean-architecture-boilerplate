@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/dto"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
-	"github.com/redis/go-redis/v9"
 )
 
 const userKeyPrefix = "user:"

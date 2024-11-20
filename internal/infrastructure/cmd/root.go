@@ -1,10 +1,11 @@
 package cmd
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/cmd/http"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/cmd/subscriber"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/cmd/task"
-	"github.com/spf13/cobra"
 )
 
 func RootCmd() *cobra.Command {

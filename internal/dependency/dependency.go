@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/caarlos0/env/v10"
+
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/service"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/environment"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/aws"
@@ -14,7 +16,6 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
 	sqsRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/interactor"
-	"github.com/caarlos0/env/v10"
 )
 
 type Dependency struct {

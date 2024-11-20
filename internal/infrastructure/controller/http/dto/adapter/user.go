@@ -1,11 +1,12 @@
 package adapter
 
 import (
+	"github.com/google/uuid"
+
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/http/dto"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/output"
-	"github.com/google/uuid"
 )
 
 func ToCreateUserInput(req *dto.CreateUserRequestBody) *input.CreateUserInput {

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/http/dto"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/http/dto/adapter"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/http/dto/request"
@@ -12,7 +14,6 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/apperror"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
-	"github.com/go-chi/chi/v5"
 )
 
 // @title			User Handler

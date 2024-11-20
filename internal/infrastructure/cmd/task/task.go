@@ -3,9 +3,10 @@ package task
 import (
 	"log"
 
+	"github.com/spf13/cobra"
+
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/task"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/task/sample"
-	"github.com/spf13/cobra"
 )
 
 func TaskCmd() *cobra.Command {

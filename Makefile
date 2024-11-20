@@ -18,6 +18,11 @@ go-mod-download:
 go-mod-tidy:
 	go mod tidy
 
+.PHONY: go-format
+go-format:
+	go fmt ./... && \
+	gci write --skip-generated -s standard -s default -s "prefix(github.com/MoneyForest/go-clean-boilerplate)" .
+
 .PHONY: swagger-gen
 swagger-gen:
 	swag init -g cmd/main.go -o pkg/swag && \
