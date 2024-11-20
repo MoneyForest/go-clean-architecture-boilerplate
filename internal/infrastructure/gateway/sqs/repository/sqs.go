@@ -3,19 +3,13 @@ package repository
 import (
 	"context"
 
+	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/dto"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 )
-
-type ReceiveMessageOptions struct {
-	MaxNumberOfMessages int32
-	WaitTimeSeconds     int32
-	VisibilityTimeout   int32
-	AttributeNames      []string
-}
 
 type SQSRepository struct {
 	sqs       *sqs.Client
@@ -37,9 +31,9 @@ func (r SQSRepository) SendMessage(ctx context.Context, message *entity.Message)
 	return err
 }
 
-func (r SQSRepository) ReceiveMessage(ctx context.Context, opts *ReceiveMessageOptions) ([]*entity.Message, error) {
+func (r SQSRepository) ReceiveMessage(ctx context.Context, opts *repository.ReceiveMessageOptions) ([]*entity.Message, error) {
 	if opts == nil {
-		opts = &ReceiveMessageOptions{
+		opts = &repository.ReceiveMessageOptions{
 			MaxNumberOfMessages: 10,
 			WaitTimeSeconds:     20,
 		}

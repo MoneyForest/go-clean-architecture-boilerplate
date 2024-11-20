@@ -113,6 +113,7 @@ func TestValidateMatch(t *testing.T) {
 				PartnerID: partnerID,
 				Status:    "invalid",
 			},
+			wantErr: ErrMatchStatusIsInvalid,
 		},
 	}
 
