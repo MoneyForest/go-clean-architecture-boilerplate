@@ -9,6 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
+type LoggerKey string
+
 func Logger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
@@ -20,7 +22,7 @@ func Logger(next http.Handler) http.Handler {
 			"method", r.Method,
 			"path", r.URL.Path,
 		)
-		ctx = context.WithValue(ctx, "logger", logger)
+		ctx = context.WithValue(ctx, LoggerKey("logger"), logger)
 		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
