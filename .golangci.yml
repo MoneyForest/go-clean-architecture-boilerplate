@@ -155,13 +155,13 @@ linters-settings:
     # Default: ""
     context: "scope"
 
-  wrapcheck:
-    ignorePackageGlobs:
-      - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain*
-      - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure*
-      - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase*
-      - github.com/avast/retry-go
-      - github.com/cenkalti/backoff
+  # wrapcheck:
+  #   ignorePackageGlobs:
+  #     - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain*
+  #     - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure*
+  #     - github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase*
+  #     - github.com/avast/retry-go
+  #     - github.com/cenkalti/backoff
 
   tenv:
     # The option `all` will run against whole test files (`_test.go`) regardless of method/function signatures.
