@@ -11,8 +11,9 @@ It puts the business logic at the center and protects it from the details of ext
 
 ```mermaid
 %%{init: {"flowchart": {"htmlLabels": true}} }%%
-graph LR
+graph TD
     subgraph External["External Interfaces"]
+        direction TB
         HTTP["HTTP"]
         DB["MySQL"]
         CACHE["Redis"]
@@ -21,9 +22,11 @@ graph LR
 
     subgraph Infrastructure["Infrastructure Layer"]
         subgraph Controller["Controller"]
+            direction TB
             H["Handler"]
         end
         subgraph Gateway["Gateway"]
+            direction TB
             MR["MySQL Repository"]
             RR["Redis Repository"]
             SR["SQS Repository"]
@@ -31,10 +34,12 @@ graph LR
     end
 
     subgraph Usecase["Usecase Layer"]
+        direction TB
         I["Interactor"]
     end
 
     subgraph Domain["Domain Layer"]
+        direction TB
         DM["Domain Model"]
         DS["Domain Service"]
         RI["Repository Interface"]
