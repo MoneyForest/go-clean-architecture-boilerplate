@@ -69,7 +69,7 @@ func TestInitRedis(t *testing.T) {
 			}
 
 			if diff := cmp.Diff(testValue, got); diff != "" {
-				t.Errorf("value mismatch (-want +got):\n%s", diff)
+				t.Errorf("value mismatching (-want +got):\n%s", diff)
 			}
 
 			if err := client.Del(ctx, testKey).Err(); err != nil {

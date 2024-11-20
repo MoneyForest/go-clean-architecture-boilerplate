@@ -10,9 +10,9 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
-func TestNewMatch(t *testing.T) {
+func TestNewMatching(t *testing.T) {
 	type args struct {
-		params InputMatchParams
+		params InputMatchingParams
 	}
 	meID := uuid.New()
 	partnerID := uuid.New()
@@ -20,18 +20,18 @@ func TestNewMatch(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *Match
+		want *Matching
 	}{
 		{
-			name: "success: match is created successfully",
+			name: "success: matching is created successfully",
 			args: args{
-				params: InputMatchParams{
+				params: InputMatchingParams{
 					MeID:      meID,
 					PartnerID: partnerID,
 					Status:    "test",
 				},
 			},
-			want: &Match{
+			want: &Matching{
 				MeID:      meID,
 				PartnerID: partnerID,
 				Status:    "test",
@@ -41,14 +41,14 @@ func TestNewMatch(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewMatch(tt.args.params)
+			got := NewMatching(tt.args.params)
 
 			diff := cmp.Diff(
 				got, tt.want,
-				cmpopts.IgnoreFields(Match{}, "ID", "CreatedAt", "UpdatedAt"),
+				cmpopts.IgnoreFields(Matching{}, "ID", "CreatedAt", "UpdatedAt"),
 			)
 			if diff != "" {
-				t.Errorf("NewMatch() mismatch (-got +want):\n%s", diff)
+				t.Errorf("NewMatching() mismatching (-got +want):\n%s", diff)
 			}
 
 			now := time.Now()
@@ -62,67 +62,67 @@ func TestNewMatch(t *testing.T) {
 	}
 }
 
-func TestValidateMatch(t *testing.T) {
+func TestValidateMatching(t *testing.T) {
 	meID := uuid.New()
 	partnerID := uuid.New()
 
 	tests := []struct {
-		name    string
-		match   *Match
-		wantErr error
+		name     string
+		matching *Matching
+		wantErr  error
 	}{
 		{
-			name: "success: valid match",
-			match: &Match{
+			name: "success: valid matching",
+			matching: &Matching{
 				MeID:      meID,
 				PartnerID: partnerID,
-				Status:    MatchStatusPending,
+				Status:    MatchingStatusPending,
 			},
 			wantErr: nil,
 		},
 		{
 			name: "error: empty meID",
-			match: &Match{
+			matching: &Matching{
 				MeID:      uuid.Nil(),
 				PartnerID: partnerID,
-				Status:    MatchStatusPending,
+				Status:    MatchingStatusPending,
 			},
-			wantErr: ErrMatchMeOrPartnerIDIsRequired,
+			wantErr: ErrMatchingMeOrPartnerIDIsRequired,
 		},
 		{
 			name: "error: empty partnerID",
-			match: &Match{
+			matching: &Matching{
 				MeID:      meID,
 				PartnerID: uuid.Nil(),
-				Status:    MatchStatusPending,
+				Status:    MatchingStatusPending,
 			},
-			wantErr: ErrMatchMeOrPartnerIDIsRequired,
+			wantErr: ErrMatchingMeOrPartnerIDIsRequired,
 		},
 		{
 			name: "error: empty status",
-			match: &Match{
+			matching: &Matching{
 				MeID:      meID,
 				PartnerID: partnerID,
 				Status:    "",
 			},
-			wantErr: ErrMatchStatusIsRequired,
+			wantErr: ErrMatchingStatusIsRequired,
 		},
 		{
 			name: "error: invalid status",
-			match: &Match{
+			matching: &Matching{
 				MeID:      meID,
 				PartnerID: partnerID,
 				Status:    "invalid",
 			},
-			wantErr: ErrMatchStatusIsInvalid,
+			wantErr: ErrMatchingStatusIsInvalid,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.match.Validate()
+			err := tt.matching.Validate()
 			if err != tt.wantErr {
-				t.Errorf("ValidateMatch() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ValidateMatching() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

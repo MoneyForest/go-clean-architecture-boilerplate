@@ -9,18 +9,18 @@ import (
 )
 
 type MatchingDomainService struct {
-	userRepo  repository.UserRepository
-	matchRepo repository.MatchRepository
+	userRepo     repository.UserRepository
+	matchingRepo repository.MatchingRepository
 }
 
-func NewMatchingDomainService(ur repository.UserRepository, mr repository.MatchRepository) *MatchingDomainService {
+func NewMatchingDomainService(ur repository.UserRepository, mr repository.MatchingRepository) *MatchingDomainService {
 	return &MatchingDomainService{
-		userRepo:  ur,
-		matchRepo: mr,
+		userRepo:     ur,
+		matchingRepo: mr,
 	}
 }
 
-func (s *MatchingDomainService) CreateMatch(ctx context.Context, meID, partnerID uuid.UUID) (*model.Match, error) {
+func (s *MatchingDomainService) CreateMatching(ctx context.Context, meID, partnerID uuid.UUID) (*model.Matching, error) {
 	_, err := s.userRepo.Get(ctx, meID)
 	if err != nil {
 		return nil, err
@@ -30,11 +30,11 @@ func (s *MatchingDomainService) CreateMatch(ctx context.Context, meID, partnerID
 		return nil, err
 	}
 
-	match := model.NewMatch(model.InputMatchParams{
+	matching := model.NewMatching(model.InputMatchingParams{
 		MeID:      meID,
 		PartnerID: partnerID,
 		Status:    "pending",
 	})
 
-	return match, nil
+	return matching, nil
 }

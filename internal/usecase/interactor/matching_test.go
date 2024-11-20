@@ -15,11 +15,11 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
-func SetupTestMatchInteractor(ctx context.Context, gw *testhelper.Gateway) (MatchInteractor, *repository.UserMySQLRepository) {
-	matchRepo := repository.NewMatchMySQLRepository(gw.MySQLClient) // ポインタを返すように &を追加
+func SetupTestMatchingInteractor(ctx context.Context, gw *testhelper.Gateway) (MatchingInteractor, *repository.UserMySQLRepository) {
+	matchingRepo := repository.NewMatchingMySQLRepository(gw.MySQLClient) // ポインタを返すように &を追加
 	userRepo := repository.NewUserMySQLRepository(gw.MySQLClient)
-	ds := service.NewMatchingDomainService(userRepo, matchRepo)
-	return NewMatchInteractor(matchRepo, ds), &userRepo
+	ds := service.NewMatchingDomainService(userRepo, matchingRepo)
+	return NewMatchingInteractor(matchingRepo, ds), &userRepo
 }
 
 func createTestUser(ctx context.Context, t *testing.T, userRepo *repository.UserMySQLRepository) *model.User {
@@ -47,26 +47,26 @@ func createTestUser(ctx context.Context, t *testing.T, userRepo *repository.User
 	return createdUser
 }
 
-func TestMatchInteractor_Create(t *testing.T) {
+func TestMatchingInteractor_Create(t *testing.T) {
 	ctx := context.Background()
 	gw, err := testhelper.Setup(ctx)
 	if err != nil {
 		t.Fatalf("Failed to setup test: %v", err)
 	}
 	defer testhelper.Cleanup(ctx, gw)
-	matchInteractor, userRepo := SetupTestMatchInteractor(ctx, gw)
+	matchingInteractor, userRepo := SetupTestMatchingInteractor(ctx, gw)
 
 	user1 := createTestUser(ctx, t, userRepo)
 	user2 := createTestUser(ctx, t, userRepo)
 
 	tests := []struct {
 		name    string
-		input   *input.CreateMatchInput
+		input   *input.CreateMatchingInput
 		wantErr bool
 	}{
 		{
 			name: "OK",
-			input: &input.CreateMatchInput{
+			input: &input.CreateMatchingInput{
 				MeID:      user1.ID,
 				PartnerID: user2.ID,
 			},
@@ -76,7 +76,7 @@ func TestMatchInteractor_Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := matchInteractor.Create(ctx, tt.input)
+			got, err := matchingInteractor.Create(ctx, tt.input)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -84,52 +84,52 @@ func TestMatchInteractor_Create(t *testing.T) {
 			if tt.wantErr {
 				return
 			}
-			if got.Match == nil {
-				t.Error("Create() got nil match")
+			if got.Matching == nil {
+				t.Error("Create() got nil matching")
 				return
 			}
-			if got.Match.MeID != tt.input.MeID || got.Match.PartnerID != tt.input.PartnerID {
-				t.Errorf("Create() got = %v, want meID: %v, partnerID: %v", got.Match, tt.input.MeID, tt.input.PartnerID)
+			if got.Matching.MeID != tt.input.MeID || got.Matching.PartnerID != tt.input.PartnerID {
+				t.Errorf("Create() got = %v, want meID: %v, partnerID: %v", got.Matching, tt.input.MeID, tt.input.PartnerID)
 			}
 		})
 	}
 }
 
-func TestMatchInteractor_Get(t *testing.T) {
+func TestMatchingInteractor_Get(t *testing.T) {
 	ctx := context.Background()
 	gw, err := testhelper.Setup(ctx)
 	if err != nil {
 		t.Fatalf("Failed to setup test: %v", err)
 	}
 	defer testhelper.Cleanup(ctx, gw)
-	matchInteractor, userRepo := SetupTestMatchInteractor(ctx, gw)
+	matchingInteractor, userRepo := SetupTestMatchingInteractor(ctx, gw)
 
 	user1 := createTestUser(ctx, t, userRepo)
 	user2 := createTestUser(ctx, t, userRepo)
 
-	created, err := matchInteractor.Create(ctx, &input.CreateMatchInput{
+	created, err := matchingInteractor.Create(ctx, &input.CreateMatchingInput{
 		MeID:      user1.ID,
 		PartnerID: user2.ID,
 	})
 	if err != nil {
-		t.Fatalf("Failed to create test match: %v", err)
+		t.Fatalf("Failed to create test matching: %v", err)
 	}
 
 	tests := []struct {
 		name    string
-		input   *input.GetMatchInput
-		want    *model.Match
+		input   *input.GetMatchingInput
+		want    *model.Matching
 		wantErr bool
 	}{
 		{
 			name:    "OK",
-			input:   &input.GetMatchInput{ID: created.Match.ID},
-			want:    created.Match,
+			input:   &input.GetMatchingInput{ID: created.Matching.ID},
+			want:    created.Matching,
 			wantErr: false,
 		},
 		{
 			name:    "NotFound",
-			input:   &input.GetMatchInput{ID: uuid.New()},
+			input:   &input.GetMatchingInput{ID: uuid.New()},
 			want:    nil,
 			wantErr: true,
 		},
@@ -137,7 +137,7 @@ func TestMatchInteractor_Get(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := matchInteractor.Get(ctx, tt.input)
+			got, err := matchingInteractor.Get(ctx, tt.input)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -146,49 +146,49 @@ func TestMatchInteractor_Get(t *testing.T) {
 				return
 			}
 			diff := cmp.Diff(
-				got.Match,
+				got.Matching,
 				tt.want,
-				cmpopts.IgnoreFields(model.Match{}, "ID", "CreatedAt", "UpdatedAt"),
+				cmpopts.IgnoreFields(model.Matching{}, "ID", "CreatedAt", "UpdatedAt"),
 			)
 			if diff != "" {
-				t.Errorf("Get() mismatch (-want +got):\n%s", diff)
+				t.Errorf("Get() mismatching (-want +got):\n%s", diff)
 			}
 		})
 	}
 }
 
-func TestMatchInteractor_List(t *testing.T) {
+func TestMatchingInteractor_List(t *testing.T) {
 	ctx := context.Background()
 	gw, err := testhelper.Setup(ctx)
 	if err != nil {
 		t.Fatalf("Failed to setup test: %v", err)
 	}
 	defer testhelper.Cleanup(ctx, gw)
-	matchInteractor, userRepo := SetupTestMatchInteractor(ctx, gw)
+	matchingInteractor, userRepo := SetupTestMatchingInteractor(ctx, gw)
 
 	user1 := createTestUser(ctx, t, userRepo)
 	user2 := createTestUser(ctx, t, userRepo)
 
 	for i := 0; i < 3; i++ {
 		partner := createTestUser(ctx, t, userRepo)
-		_, err := matchInteractor.Create(ctx, &input.CreateMatchInput{
+		_, err := matchingInteractor.Create(ctx, &input.CreateMatchingInput{
 			MeID:      user1.ID,
 			PartnerID: partner.ID,
 		})
 		if err != nil {
-			t.Fatalf("Failed to create test match: %v", err)
+			t.Fatalf("Failed to create test matching: %v", err)
 		}
 	}
 
 	tests := []struct {
 		name    string
-		input   *input.ListMatchInput
+		input   *input.ListMatchingInput
 		want    int
 		wantErr bool
 	}{
 		{
-			name: "OK_AllMatches",
-			input: &input.ListMatchInput{
+			name: "OK_AllMatchinges",
+			input: &input.ListMatchingInput{
 				UserID: user1.ID,
 				Limit:  10,
 				Offset: 0,
@@ -197,8 +197,8 @@ func TestMatchInteractor_List(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "OK_LimitedMatches",
-			input: &input.ListMatchInput{
+			name: "OK_LimitedMatchinges",
+			input: &input.ListMatchingInput{
 				UserID: user1.ID,
 				Limit:  2,
 				Offset: 0,
@@ -207,8 +207,8 @@ func TestMatchInteractor_List(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "OK_NoMatches",
-			input: &input.ListMatchInput{
+			name: "OK_NoMatchinges",
+			input: &input.ListMatchingInput{
 				UserID: user2.ID,
 				Limit:  10,
 				Offset: 0,
@@ -220,58 +220,58 @@ func TestMatchInteractor_List(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := matchInteractor.List(ctx, tt.input)
+			got, err := matchingInteractor.List(ctx, tt.input)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("List() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if len(got.Matches) != tt.want {
-				t.Errorf("List() got = %v matches, want %v", len(got.Matches), tt.want)
+			if len(got.Matchinges) != tt.want {
+				t.Errorf("List() got = %v matchinges, want %v", len(got.Matchinges), tt.want)
 			}
 		})
 	}
 }
 
-func TestMatchInteractor_Update(t *testing.T) {
+func TestMatchingInteractor_Update(t *testing.T) {
 	ctx := context.Background()
 	gw, err := testhelper.Setup(ctx)
 	if err != nil {
 		t.Fatalf("Failed to setup test: %v", err)
 	}
 	defer testhelper.Cleanup(ctx, gw)
-	matchInteractor, userRepo := SetupTestMatchInteractor(ctx, gw)
+	matchingInteractor, userRepo := SetupTestMatchingInteractor(ctx, gw)
 
 	user1 := createTestUser(ctx, t, userRepo)
 	user2 := createTestUser(ctx, t, userRepo)
 
-	created, err := matchInteractor.Create(ctx, &input.CreateMatchInput{
+	created, err := matchingInteractor.Create(ctx, &input.CreateMatchingInput{
 		MeID:      user1.ID,
 		PartnerID: user2.ID,
 	})
 	if err != nil {
-		t.Fatalf("Failed to create test match: %v", err)
+		t.Fatalf("Failed to create test matching: %v", err)
 	}
 
 	tests := []struct {
 		name    string
-		input   *input.UpdateMatchInput
-		want    model.MatchStatus
+		input   *input.UpdateMatchingInput
+		want    model.MatchingStatus
 		wantErr bool
 	}{
 		{
 			name: "OK",
-			input: &input.UpdateMatchInput{
-				ID:     created.Match.ID,
-				Status: model.MatchStatusAccepted,
+			input: &input.UpdateMatchingInput{
+				ID:     created.Matching.ID,
+				Status: model.MatchingStatusAccepted,
 			},
-			want:    model.MatchStatusAccepted,
+			want:    model.MatchingStatusAccepted,
 			wantErr: false,
 		},
 		{
 			name: "NG_NotFound",
-			input: &input.UpdateMatchInput{
+			input: &input.UpdateMatchingInput{
 				ID:     uuid.New(),
-				Status: model.MatchStatusAccepted,
+				Status: model.MatchingStatusAccepted,
 			},
 			wantErr: true,
 		},
@@ -279,7 +279,7 @@ func TestMatchInteractor_Update(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := matchInteractor.Update(ctx, tt.input)
+			got, err := matchingInteractor.Update(ctx, tt.input)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -287,42 +287,42 @@ func TestMatchInteractor_Update(t *testing.T) {
 			if tt.wantErr {
 				return
 			}
-			if got.Match.Status != tt.want {
-				t.Errorf("Update() got status = %v, want %v", got.Match.Status, tt.want)
+			if got.Matching.Status != tt.want {
+				t.Errorf("Update() got status = %v, want %v", got.Matching.Status, tt.want)
 			}
 		})
 	}
 }
 
-func TestMatchInteractor_Delete(t *testing.T) {
+func TestMatchingInteractor_Delete(t *testing.T) {
 	ctx := context.Background()
 	gw, err := testhelper.Setup(ctx)
 	if err != nil {
 		t.Fatalf("Failed to setup test: %v", err)
 	}
 	defer testhelper.Cleanup(ctx, gw)
-	matchInteractor, userRepo := SetupTestMatchInteractor(ctx, gw)
+	matchingInteractor, userRepo := SetupTestMatchingInteractor(ctx, gw)
 
 	user1 := createTestUser(ctx, t, userRepo)
 	user2 := createTestUser(ctx, t, userRepo)
 
-	created, err := matchInteractor.Create(ctx, &input.CreateMatchInput{
+	created, err := matchingInteractor.Create(ctx, &input.CreateMatchingInput{
 		MeID:      user1.ID,
 		PartnerID: user2.ID,
 	})
 	if err != nil {
-		t.Fatalf("Failed to create test match: %v", err)
+		t.Fatalf("Failed to create test matching: %v", err)
 	}
 
 	tests := []struct {
 		name    string
-		input   *input.DeleteMatchInput
+		input   *input.DeleteMatchingInput
 		wantErr bool
 	}{
 		{
 			name: "OK",
-			input: &input.DeleteMatchInput{
-				ID: created.Match.ID,
+			input: &input.DeleteMatchingInput{
+				ID: created.Matching.ID,
 			},
 			wantErr: false,
 		},
@@ -330,7 +330,7 @@ func TestMatchInteractor_Delete(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := matchInteractor.Delete(ctx, tt.input)
+			got, err := matchingInteractor.Delete(ctx, tt.input)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -19,9 +19,9 @@ import (
 )
 
 type Dependency struct {
-	Environment     *environment.Environment
-	UserInteractor  interactor.UserInteractor
-	MatchInteractor interactor.MatchInteractor
+	Environment        *environment.Environment
+	UserInteractor     interactor.UserInteractor
+	MatchingInteractor interactor.MatchingInteractor
 }
 
 func Inject(ctx context.Context) (*Dependency, error) {
@@ -68,18 +68,18 @@ func Inject(ctx context.Context) (*Dependency, error) {
 	redisUserRepository := redisRepo.NewUserRedisRepository(redisClient)
 	sqsUserRepository := sqsRepo.NewSQSRepository(sqsClient.Client, e.SQSQueueNameSample)
 
-	mysqlMatchRepository := mysqlRepo.NewMatchMySQLRepository(mysqlClient)
+	mysqlMatchingRepository := mysqlRepo.NewMatchingMySQLRepository(mysqlClient)
 
 	// Initialize domain service
-	matchingDomainService := service.NewMatchingDomainService(mysqlUserRepository, mysqlMatchRepository)
+	matchingDomainService := service.NewMatchingDomainService(mysqlUserRepository, mysqlMatchingRepository)
 
 	// Initialize interactor
 	userInteractor := interactor.NewUserInteractor(mysqlUserRepository, redisUserRepository, sqsUserRepository)
-	matchInteractor := interactor.NewMatchInteractor(mysqlMatchRepository, matchingDomainService)
+	matchingInteractor := interactor.NewMatchingInteractor(mysqlMatchingRepository, matchingDomainService)
 
 	return &Dependency{
-		Environment:     e,
-		UserInteractor:  userInteractor,
-		MatchInteractor: matchInteractor,
+		Environment:        e,
+		UserInteractor:     userInteractor,
+		MatchingInteractor: matchingInteractor,
 	}, nil
 }

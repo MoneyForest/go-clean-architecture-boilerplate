@@ -5,26 +5,26 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
 )
 
-type CreateMatchInput struct {
+type CreateMatchingInput struct {
 	MeID      uuid.UUID `json:"user1_id"`
 	PartnerID uuid.UUID `json:"user2_id"`
 }
 
-type GetMatchInput struct {
+type GetMatchingInput struct {
 	ID uuid.UUID `json:"id"`
 }
 
-type ListMatchInput struct {
+type ListMatchingInput struct {
 	UserID uuid.UUID `json:"user_id"`
 	Limit  int       `json:"limit"`
 	Offset int       `json:"offset"`
 }
 
-type UpdateMatchInput struct {
-	ID     uuid.UUID         `json:"id"`
-	Status model.MatchStatus `json:"status"`
+type UpdateMatchingInput struct {
+	ID     uuid.UUID            `json:"id"`
+	Status model.MatchingStatus `json:"status"`
 }
 
-type DeleteMatchInput struct {
+type DeleteMatchingInput struct {
 	ID uuid.UUID `json:"id"`
 }
