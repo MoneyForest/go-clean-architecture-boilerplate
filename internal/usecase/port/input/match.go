@@ -1,6 +1,9 @@
 package input
 
-import "github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
+import (
+	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
+	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
+)
 
 type CreateMatchInput struct {
 	MeID      uuid.UUID `json:"user1_id"`
@@ -18,8 +21,8 @@ type ListMatchInput struct {
 }
 
 type UpdateMatchInput struct {
-	ID     uuid.UUID `json:"id"`
-	Status string    `json:"status"`
+	ID     uuid.UUID         `json:"id"`
+	Status model.MatchStatus `json:"status"`
 }
 
 type DeleteMatchInput struct {

@@ -23,7 +23,7 @@ func (r MatchMySQLRepository) BeginTx(ctx context.Context) (*sql.Tx, error) {
 }
 
 func (r MatchMySQLRepository) CreateTx(ctx context.Context, tx *sql.Tx, match *model.Match) (*model.Match, error) {
-	query := `INSERT INTO match (id, user1_id, user2_id, status, created_at, updated_at)
+	query := `INSERT INTO matching (id, me_id, partner_id, status, created_at, updated_at)
               VALUES (?, ?, ?, ?, ?, ?)`
 
 	_, err := tx.ExecContext(ctx, query,
@@ -37,9 +37,9 @@ func (r MatchMySQLRepository) CreateTx(ctx context.Context, tx *sql.Tx, match *m
 }
 
 func (r MatchMySQLRepository) List(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*model.Match, error) {
-	query := `SELECT id, user1_id, user2_id, status, created_at, updated_at
-              FROM match
-              WHERE user1_id = ? OR user2_id = ?
+	query := `SELECT id, me_id, partner_id, status, created_at, updated_at
+              FROM matching
+              WHERE me_id = ? OR partner_id = ?
               LIMIT ? OFFSET ?`
 
 	var entities []*entity.MatchEntity
@@ -72,8 +72,8 @@ func (r MatchMySQLRepository) List(ctx context.Context, userID uuid.UUID, limit,
 }
 
 func (r MatchMySQLRepository) Get(ctx context.Context, id uuid.UUID) (*model.Match, error) {
-	query := `SELECT id, user1_id, user2_id, status, created_at, updated_at
-              FROM match
+	query := `SELECT id, me_id, partner_id, status, created_at, updated_at
+              FROM matching
               WHERE id = ?`
 
 	var entity entity.MatchEntity
@@ -93,7 +93,7 @@ func (r MatchMySQLRepository) Get(ctx context.Context, id uuid.UUID) (*model.Mat
 }
 
 func (r MatchMySQLRepository) UpdateTx(ctx context.Context, tx *sql.Tx, match *model.Match) (*model.Match, error) {
-	query := `UPDATE match
+	query := `UPDATE matching
               SET status = ?, updated_at = NOW()
               WHERE id = ?`
 
@@ -106,7 +106,7 @@ func (r MatchMySQLRepository) UpdateTx(ctx context.Context, tx *sql.Tx, match *m
 }
 
 func (r MatchMySQLRepository) DeleteTx(ctx context.Context, tx *sql.Tx, id uuid.UUID) (*uuid.UUID, error) {
-	query := `DELETE FROM match WHERE id = ?`
+	query := `DELETE FROM matching WHERE id = ?`
 
 	_, err := tx.ExecContext(ctx, query, id)
 	if err != nil {
