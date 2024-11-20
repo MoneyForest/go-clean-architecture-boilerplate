@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/service"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
@@ -83,7 +84,7 @@ func (i *matchInteractor) Update(ctx context.Context, input *input.UpdateMatchIn
 		return nil, err
 	}
 
-	match.Status = input.Status
+	match.Status = model.MatchStatus(input.Status)
 	match.UpdatedAt = time.Now()
 
 	tx, err := i.mysql.BeginTx(ctx)

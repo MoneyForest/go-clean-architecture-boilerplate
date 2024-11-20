@@ -18,7 +18,7 @@ func ToMatchModel(entity *entity.MatchEntity) (*model.Match, error) {
 		ID:        uuid.MustParse(entity.ID),
 		MeID:      uuid.MustParse(entity.MeID),
 		PartnerID: uuid.MustParse(entity.PartnerID),
-		Status:    entity.Status,
+		Status:    model.MatchStatus(entity.Status),
 		CreatedAt: entity.CreatedAt,
 		UpdatedAt: entity.UpdatedAt,
 	}, nil
@@ -41,7 +41,7 @@ func ToMatchEntity(model *model.Match) *entity.MatchEntity {
 		ID:        model.ID.String(),
 		MeID:      model.MeID.String(),
 		PartnerID: model.PartnerID.String(),
-		Status:    model.Status,
+		Status:    string(model.Status),
 		CreatedAt: model.CreatedAt,
 		UpdatedAt: model.UpdatedAt,
 	}

@@ -75,7 +75,7 @@ func TestValidateMatch(t *testing.T) {
 			match: &Match{
 				MeID:      meID,
 				PartnerID: partnerID,
-				Status:    "test",
+				Status:    MatchStatusPending,
 			},
 			wantErr: nil,
 		},
@@ -84,7 +84,7 @@ func TestValidateMatch(t *testing.T) {
 			match: &Match{
 				MeID:      uuid.Nil(),
 				PartnerID: partnerID,
-				Status:    "test",
+				Status:    MatchStatusPending,
 			},
 			wantErr: ErrMatchMeOrPartnerIDIsRequired,
 		},
@@ -93,7 +93,7 @@ func TestValidateMatch(t *testing.T) {
 			match: &Match{
 				MeID:      meID,
 				PartnerID: uuid.Nil(),
-				Status:    "test",
+				Status:    MatchStatusPending,
 			},
 			wantErr: ErrMatchMeOrPartnerIDIsRequired,
 		},
@@ -105,6 +105,14 @@ func TestValidateMatch(t *testing.T) {
 				Status:    "",
 			},
 			wantErr: ErrMatchStatusIsRequired,
+		},
+		{
+			name: "error: invalid status",
+			match: &Match{
+				MeID:      meID,
+				PartnerID: partnerID,
+				Status:    "invalid",
+			},
 		},
 	}
 

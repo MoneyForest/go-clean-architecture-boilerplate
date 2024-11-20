@@ -10,13 +10,26 @@ import (
 var (
 	ErrMatchMeOrPartnerIDIsRequired = errors.New("match me or partner id is required")
 	ErrMatchStatusIsRequired        = errors.New("match status is required")
+	ErrMatchStatusIsInvalid         = errors.New("match status is invalid")
 )
+
+type MatchStatus string
+
+const (
+	MatchStatusPending  MatchStatus = "pending"
+	MatchStatusAccepted MatchStatus = "accepted"
+)
+
+var MatchStatuses = map[MatchStatus]struct{}{
+	MatchStatusPending:  {},
+	MatchStatusAccepted: {},
+}
 
 type Match struct {
 	ID        uuid.UUID
 	MeID      uuid.UUID
 	PartnerID uuid.UUID
-	Status    string
+	Status    MatchStatus
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -36,7 +49,7 @@ func NewMatch(params InputMatchParams) *Match {
 		ID:        params.ID,
 		MeID:      params.MeID,
 		PartnerID: params.PartnerID,
-		Status:    params.Status,
+		Status:    MatchStatus(params.Status),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -48,6 +61,9 @@ func (m *Match) Validate() error {
 	}
 	if m.Status == "" {
 		return ErrMatchStatusIsRequired
+	}
+	if _, ok := MatchStatuses[m.Status]; !ok {
+		return ErrMatchStatusIsInvalid
 	}
 	return nil
 }
