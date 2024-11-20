@@ -53,7 +53,7 @@ func TestNewUser(t *testing.T) {
 	}
 }
 
-func TestValidate(t *testing.T) {
+func TestValidateUser(t *testing.T) {
 	tests := []struct {
 		name    string
 		user    *User
