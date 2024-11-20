@@ -11,10 +11,9 @@ import (
 
 type Key string
 
+// 実際のキューIDとキュー名のマップにすることで環境差異を吸収
 const (
-	// 実際のキューIDを定数として定義
 	SQSKeySample Key = "sample"
-	// 必要に応じて他のキューIDを追加
 )
 
 type SQSConfig struct {
