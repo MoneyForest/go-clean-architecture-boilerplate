@@ -117,9 +117,26 @@ graph TD
 │   │   ├── gateway
 │   │   │   ├── mysql
 │   │   │   └── redis
+│   │   │
 │   │   └── environment
 │   │
 │   └── dependency
 │
 └── pkg
 ```
+
+## Technology Stack
+
+| Category | Component | Details |
+|----------|-----------|----------|
+| **Backend** | Architecture | Clean Architecture |
+| | Language | Go |
+| | Framework | • Chi (HTTP router and dispatcher)<br>• Cobra (Command-line framework) |
+| | Documentation | OpenAPI (API documentation) |
+| **Database & Caching** | PDatabase | MySQL 8.0 |
+| | Cache | Redis |
+| | ORM | database/sql |
+| **Infrastructure & Cloud** | Container | Docker |
+| | Message Queue | AWS SQS |
+| | CI/CD | GitHub Actions |
+| **Tools** | Documentation Generator | Swag (Generate OpenAPI documentation) |
