@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/caarlos0/env/v10"
+
+	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/service"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/environment"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/aws"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql"
@@ -13,12 +16,12 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
 	sqsRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/interactor"
-	"github.com/caarlos0/env/v10"
 )
 
 type Dependency struct {
-	Environment    *environment.Environment
-	UserInteractor interactor.UserInteractor
+	Environment     *environment.Environment
+	UserInteractor  interactor.UserInteractor
+	MatchInteractor interactor.MatchInteractor
 }
 
 func Inject(ctx context.Context) (*Dependency, error) {
@@ -65,11 +68,18 @@ func Inject(ctx context.Context) (*Dependency, error) {
 	redisUserRepository := redisRepo.NewUserRedisRepository(redisClient)
 	sqsUserRepository := sqsRepo.NewSQSRepository(sqsClient.Client, e.SQSQueueNameSample)
 
+	mysqlMatchRepository := mysqlRepo.NewMatchMySQLRepository(mysqlClient)
+
+	// Initialize domain service
+	matchingDomainService := service.NewMatchingDomainService(mysqlUserRepository, mysqlMatchRepository)
+
 	// Initialize interactor
 	userInteractor := interactor.NewUserInteractor(mysqlUserRepository, redisUserRepository, sqsUserRepository)
+	matchInteractor := interactor.NewMatchInteractor(mysqlMatchRepository, matchingDomainService)
 
 	return &Dependency{
-		Environment:    e,
-		UserInteractor: userInteractor,
+		Environment:     e,
+		UserInteractor:  userInteractor,
+		MatchInteractor: matchInteractor,
 	}, nil
 }

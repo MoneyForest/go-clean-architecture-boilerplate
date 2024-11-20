@@ -7,10 +7,8 @@ import (
 	"time"
 
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
-	mysql "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
-	redis "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/repository"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
-	sqs "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/output"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
@@ -26,16 +24,16 @@ type UserInteractor interface {
 }
 
 type userInteractor struct {
-	mysql mysql.UserMySQLRepository
-	redis redis.UserRedisRepository
-	sqs   sqs.SQSRepository
+	repo     repository.UserRepository
+	cache    repository.UserCacheRepository
+	msgQueue repository.UserMessageQueueRepository
 }
 
-func NewUserInteractor(mysql mysql.UserMySQLRepository, redis redis.UserRedisRepository, sqs sqs.SQSRepository) UserInteractor {
+func NewUserInteractor(repo repository.UserRepository, cache repository.UserCacheRepository, msgQueue repository.UserMessageQueueRepository) UserInteractor {
 	return &userInteractor{
-		mysql: mysql,
-		redis: redis,
-		sqs:   sqs,
+		repo:     repo,
+		cache:    cache,
+		msgQueue: msgQueue,
 	}
 }
 
@@ -45,7 +43,7 @@ func (i *userInteractor) Create(ctx context.Context, input *input.CreateUserInpu
 		return nil, err
 	}
 
-	tx, err := i.mysql.BeginTx(ctx)
+	tx, err := i.repo.BeginTx(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +53,7 @@ func (i *userInteractor) Create(ctx context.Context, input *input.CreateUserInpu
 		}
 	}()
 
-	createdUser, err := i.mysql.CreateTx(ctx, tx, user)
+	createdUser, err := i.repo.CreateTx(ctx, tx, user)
 	if err != nil {
 		return nil, err
 	}
@@ -64,22 +62,22 @@ func (i *userInteractor) Create(ctx context.Context, input *input.CreateUserInpu
 		return nil, err
 	}
 
-	if err := i.redis.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
+	if err := i.cache.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
 		log.Printf("failed to set cache: %v\n", err)
 	}
 	return &output.CreateUserOutput{User: createdUser}, nil
 }
 
 func (i *userInteractor) Get(ctx context.Context, input *input.GetUserInput) (*output.GetUserOutput, error) {
-	user, err := i.redis.Get(ctx, input.ID)
+	user, err := i.cache.Get(ctx, input.ID)
 	if err == nil {
 		return &output.GetUserOutput{User: user}, nil
 	}
-	user, err = i.mysql.Get(ctx, input.ID)
+	user, err = i.repo.Get(ctx, input.ID)
 	if err != nil {
 		return nil, err
 	}
-	if err := i.redis.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
+	if err := i.cache.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
 		log.Printf("failed to set cache: %v\n", err)
 	}
 
@@ -87,7 +85,7 @@ func (i *userInteractor) Get(ctx context.Context, input *input.GetUserInput) (*o
 }
 
 func (i *userInteractor) List(ctx context.Context, input *input.ListUserInput) (*output.ListUserOutput, error) {
-	users, err := i.mysql.List(ctx, input.Limit, input.Offset)
+	users, err := i.repo.List(ctx, input.Limit, input.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +98,7 @@ func (i *userInteractor) Update(ctx context.Context, input *input.UpdateUserInpu
 		return nil, err
 	}
 
-	tx, err := i.mysql.BeginTx(ctx)
+	tx, err := i.repo.BeginTx(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +108,7 @@ func (i *userInteractor) Update(ctx context.Context, input *input.UpdateUserInpu
 		}
 	}()
 
-	updatedUser, err := i.mysql.UpdateTx(ctx, tx, user)
+	updatedUser, err := i.repo.UpdateTx(ctx, tx, user)
 	if err != nil {
 		return nil, err
 	}
@@ -119,14 +117,14 @@ func (i *userInteractor) Update(ctx context.Context, input *input.UpdateUserInpu
 		return nil, err
 	}
 
-	if err := i.redis.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
+	if err := i.cache.SetWithTTL(ctx, user, 3600*time.Second); err != nil {
 		log.Printf("failed to set cache: %v\n", err)
 	}
 	return &output.UpdateUserOutput{User: updatedUser}, nil
 }
 
 func (i *userInteractor) Delete(ctx context.Context, input *input.DeleteUserInput) (*output.DeleteUserOutput, error) {
-	tx, err := i.mysql.BeginTx(ctx)
+	tx, err := i.repo.BeginTx(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +134,7 @@ func (i *userInteractor) Delete(ctx context.Context, input *input.DeleteUserInpu
 		}
 	}()
 
-	deletedID, err := i.mysql.DeleteTx(ctx, tx, input.ID)
+	deletedID, err := i.repo.DeleteTx(ctx, tx, input.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +143,7 @@ func (i *userInteractor) Delete(ctx context.Context, input *input.DeleteUserInpu
 		return nil, err
 	}
 
-	if err := i.redis.Delete(ctx, input.ID); err != nil {
+	if err := i.cache.Delete(ctx, input.ID); err != nil {
 		log.Printf("failed to delete cache: %v\n", err)
 	}
 	return &output.DeleteUserOutput{ID: deletedID}, nil
@@ -157,13 +155,13 @@ func (i *userInteractor) ProcessMessage(ctx context.Context, input *input.Proces
 		return nil, err
 	}
 
-	if err := i.sqs.SendMessage(ctx, &entity.Message{
+	if err := i.msgQueue.SendMessage(ctx, &entity.Message{
 		Body: string(userIDBytes),
 	}); err != nil {
 		return nil, err
 	}
 
-	msgs, err := i.sqs.ReceiveMessage(ctx, &sqs.ReceiveMessageOptions{
+	msgs, err := i.msgQueue.ReceiveMessage(ctx, &repository.ReceiveMessageOptions{
 		MaxNumberOfMessages: 1,
 	})
 	if err != nil {
@@ -175,7 +173,7 @@ func (i *userInteractor) ProcessMessage(ctx context.Context, input *input.Proces
 
 	msg := msgs[0]
 	defer func() {
-		if err := i.sqs.DeleteMessage(ctx, msg.ReceiptHandle); err != nil {
+		if err := i.msgQueue.DeleteMessage(ctx, msg.ReceiptHandle); err != nil {
 			log.Printf("Failed to delete message: %v", err)
 		}
 	}()

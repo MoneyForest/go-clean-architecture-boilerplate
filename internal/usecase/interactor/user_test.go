@@ -5,21 +5,22 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
-	mysqlRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
 	redisRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
 	sqsRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/testhelper"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func SetupTestUserInteractor(ctx context.Context, gw *testhelper.Gateway) UserInteractor {
 	return NewUserInteractor(
-		mysqlRepo.NewUserMySQLRepository(gw.MySQLClient),
+		repository.NewUserMySQLRepository(gw.MySQLClient),
 		redisRepo.NewUserRedisRepository(gw.RedisClient),
 		sqsRepo.NewSQSRepository(gw.SQSClient.Client, gw.SQSClient.QueueURLs[sqs.SQSKeySample]),
 	)

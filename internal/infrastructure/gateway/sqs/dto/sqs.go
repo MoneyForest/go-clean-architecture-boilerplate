@@ -1,9 +1,10 @@
 package dto
 
 import (
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
+
+	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
 )
 
 func FromSQSMessage(sqsMsg types.Message) *entity.Message {
