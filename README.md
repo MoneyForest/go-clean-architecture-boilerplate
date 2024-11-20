@@ -11,7 +11,7 @@ It puts the business logic at the center and protects it from the details of ext
 
 ```mermaid
 %%{init: {"flowchart": {"htmlLabels": true}} }%%
-graph LR
+graph TD
     subgraph External["External Interfaces"]
         direction TB
         HTTP["HTTP"]
@@ -34,6 +34,7 @@ graph LR
     end
 
     subgraph Usecase["Usecase Layer"]
+        direction TB
         I["Interactor"]
     end
 
