@@ -57,5 +57,6 @@ func main() {
 		for _, violation := range violations {
 			fmt.Print(violation)
 		}
+		os.Exit(1)
 	}
 }
