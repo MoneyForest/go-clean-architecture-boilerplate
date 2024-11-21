@@ -8,6 +8,7 @@ import (
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/repository"
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/service"
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/transaction"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql"
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase/port/output"
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
@@ -36,6 +37,7 @@ func NewMatchingInteractor(txManager transaction.Manager, repo repository.Matchi
 }
 
 func (i *matchingInteractor) Create(ctx context.Context, input *input.CreateMatchingInput) (*output.CreateMatchingOutput, error) {
+	mysql.InitDB(ctx, mysql.DBConfig{})
 	matching, err := i.service.CreateMatching(ctx, input.MeID, input.PartnerID)
 	if err != nil {
 		return nil, err

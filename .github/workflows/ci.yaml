@@ -93,3 +93,10 @@ jobs:
         with:
           files: ./
           config: _typos.toml
+
+  lint-architecture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check architecture
+        run: go run tools/architecture-linter/main.go
