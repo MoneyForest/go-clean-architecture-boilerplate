@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/dependency"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/dependency"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase/port/input"
 )
 
 func Run(ctx context.Context, dependency *dependency.Dependency, args []string) error {

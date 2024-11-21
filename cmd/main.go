@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/cmd"
-	_ "github.com/MoneyForest/go-clean-boilerplate/pkg/swag"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/cmd"
+	_ "github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/swag"
 )
 
 //	@title			Go Clean Architecture API

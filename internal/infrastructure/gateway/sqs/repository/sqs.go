@@ -7,9 +7,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/repository"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/dto"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/model"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/repository"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/sqs/dto"
 )
 
 type SQSRepository struct {

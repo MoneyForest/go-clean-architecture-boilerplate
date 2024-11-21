@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/aws"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/aws"
 )
 
 func TestInitSQS(t *testing.T) {

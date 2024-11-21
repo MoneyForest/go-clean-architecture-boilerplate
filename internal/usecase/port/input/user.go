@@ -1,6 +1,6 @@
 package input
 
-import "github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
+import "github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 
 type CreateUserInput struct {
 	Email string `json:"email"`

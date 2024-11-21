@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/dependency"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/dependency"
 )
 
 func Run(f func(ctx context.Context, dependency *dependency.Dependency, args []string) error, args []string) error {

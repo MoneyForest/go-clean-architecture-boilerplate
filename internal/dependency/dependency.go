@@ -6,17 +6,17 @@ import (
 
 	"github.com/caarlos0/env/v10"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/service"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/environment"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/aws"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql"
-	mysqlRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/transaction"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis"
-	redisRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/repository"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
-	sqsRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/repository"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/interactor"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/service"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/environment"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/aws"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql"
+	mysqlRepo "github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql/repository"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql/transaction"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/redis"
+	redisRepo "github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/redis/repository"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/sqs"
+	sqsRepo "github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/sqs/repository"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase/interactor"
 )
 
 type Dependency struct {

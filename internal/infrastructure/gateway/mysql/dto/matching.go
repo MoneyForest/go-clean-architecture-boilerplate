@@ -3,9 +3,9 @@ package dto
 import (
 	"errors"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/entity"
-	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/model"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql/entity"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 )
 
 func ToMatchingModel(entity *entity.MatchingEntity) (*model.Matching, error) {

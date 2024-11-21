@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
-	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/model"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 )
 
 type MatchingRepository interface {

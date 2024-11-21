@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/MoneyForest/go-clean-boilerplate/pkg/apperror"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/apperror"
 )
 
 type ErrorResponse struct {

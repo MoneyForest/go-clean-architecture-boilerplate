@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 
-	awscfg "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/aws"
+	awscfg "github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/aws"
 )
 
 type Key string

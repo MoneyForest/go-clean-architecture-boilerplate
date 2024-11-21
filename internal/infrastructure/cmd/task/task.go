@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/task"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/task/sample"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/controller/task"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/controller/task/sample"
 )
 
 func TaskCmd() *cobra.Command {

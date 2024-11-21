@@ -1,8 +1,8 @@
 package dto
 
 import (
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/model"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/sqs/entity"
 )
 
 func ToMessageModel(entity *entity.Message) *model.Message {

@@ -14,9 +14,9 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/dependency"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/http/handler"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/http/middleware"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/dependency"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/controller/http/handler"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/controller/http/middleware"
 )
 
 func Run() error {

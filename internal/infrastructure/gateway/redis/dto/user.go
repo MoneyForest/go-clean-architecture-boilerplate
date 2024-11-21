@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/entity"
-	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/model"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/redis/entity"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 )
 
 func ToUserModel(entity *entity.UserEntity) (*model.User, error) {

@@ -3,8 +3,8 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/http/dto/response"
-	"github.com/MoneyForest/go-clean-boilerplate/pkg/apperror"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/controller/http/dto/response"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/apperror"
 )
 
 func Recover(next http.Handler) http.Handler {

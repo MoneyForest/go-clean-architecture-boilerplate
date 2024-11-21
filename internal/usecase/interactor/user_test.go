@@ -8,15 +8,15 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/repository"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/mysql/transaction"
-	redisRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/redis/repository"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs"
-	sqsRepo "github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/repository"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
-	"github.com/MoneyForest/go-clean-boilerplate/pkg/testhelper"
-	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/model"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql/repository"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql/transaction"
+	redisRepo "github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/redis/repository"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/sqs"
+	sqsRepo "github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/sqs/repository"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase/port/input"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/testhelper"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 )
 
 func SetupTestUserInteractor(ctx context.Context, gw *testhelper.Gateway) UserInteractor {

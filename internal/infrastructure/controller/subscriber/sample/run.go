@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/dependency"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
-	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/dependency"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase/port/input"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 )
 
 type Message struct {

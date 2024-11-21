@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/subscriber"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/subscriber/sample"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/controller/subscriber"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/controller/subscriber/sample"
 )
 
 func SubscriberCmd() *cobra.Command {

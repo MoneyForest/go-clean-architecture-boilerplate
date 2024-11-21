@@ -6,12 +6,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/repository"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/transaction"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/output"
-	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/model"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/repository"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/transaction"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase/port/input"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase/port/output"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 )
 
 type UserInteractor interface {

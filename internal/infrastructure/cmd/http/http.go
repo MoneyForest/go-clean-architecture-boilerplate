@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/controller/http"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/controller/http"
 )
 
 func HTTPCmd() *cobra.Command {

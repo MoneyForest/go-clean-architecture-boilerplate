@@ -1,4 +1,4 @@
-module github.com/MoneyForest/go-clean-boilerplate
+module github.com/MoneyForest/go-clean-architecture-boilerplate
 
 go 1.23.2
 
