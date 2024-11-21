@@ -25,6 +25,7 @@ go-format:
 
 .PHONY: swagger-gen
 swagger-gen:
+	go install github.com/swaggo/swag/cmd/swag@latest && \
 	swag init -g cmd/main.go -o pkg/swag && \
 	swag fmt
 
