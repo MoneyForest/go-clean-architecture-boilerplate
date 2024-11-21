@@ -6,8 +6,8 @@ import (
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/repository"
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/service"
-	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/transaction"
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase/port"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/usecase/transaction"
 )
 
 type MatchingInteractor struct {
