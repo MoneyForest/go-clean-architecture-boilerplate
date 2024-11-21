@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ./go.mod
+          cache: true
+      - name: mod download
+        run: go mod download
+      - name: build
+        run: go build -o ./.bin/app ./cmd
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Compose
+        run: |
+          docker compose up -d
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ./go.mod
+          cache: true
+      - name: Wait for containers
+        run: |
+          timeout 30s bash -c 'until docker compose exec -T mysql mysqladmin ping -h localhost -u root -ppassword --silent; do sleep 1; done'
+          timeout 30s bash -c 'until docker compose exec -T redis redis-cli --no-auth-warning ping; do sleep 1; done'
+          timeout 30s bash -c 'until docker compose exec -T localstack aws --endpoint-url=http://localhost:4566 sqs list-queues; do sleep 1; done'
+      - name: test
+        run: sudo go test ./...
+      - name: Clean up
+        if: always()
+        run: docker compose down
+
+  openapi:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ./go.mod
+          cache: true
+      - name: mod download
+        run: go mod download
+      - name: Check swag generation
+        run: |
+          make swagger-gen
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Detected uncommitted changes after swag generation"
+            git status
+            git diff
+            exit 1
+          fi
+
+  # lint-go:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 2
+  #     - name: golangci-lint
+  #       uses: golangci/golangci-lint-action@v6
+  #       with:
+  #         version: v1.60.3
+  #         args: -v --timeout=10m -c .golangci.yml
+
+  lint-typos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check typos
+        uses: crate-ci/typos@v1.27.3
+        with:
+          files: ./
+          config: _typos.toml
+
+  lint-architecture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check architecture
+        run: go run tools/import-violation-checker/main.go
