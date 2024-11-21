@@ -23,8 +23,8 @@ type UserHandler struct {
 // @Produce	json
 // @Param		body	body		request.CreateUserRequestBody	true	"User data"
 // @Success	201		{object}	response.CreateUserResponse
-// @Failure	400		{object}	apperror.AppError
-// @Failure	500		{object}	apperror.AppError
+// @Failure	400		{object}	error.DomainError
+// @Failure	500		{object}	error.DomainError
 // @Router		/users [post]
 func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	reqBody, err := request.DecodeCreateUserRequest(r)
@@ -53,9 +53,9 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Produce	json
 // @Param		id	path		string	true	"User ID"	format(uuid)
 // @Success	200	{object}	response.GetUserResponse
-// @Failure	400	{object}	apperror.AppError
-// @Failure	404	{object}	apperror.AppError
-// @Failure	500	{object}	apperror.AppError
+// @Failure	400	{object}	error.DomainError
+// @Failure	404	{object}	error.DomainError
+// @Failure	500	{object}	error.DomainError
 // @Router		/users/{id} [get]
 func (h *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 	params, err := request.DecodeGetUserRequest(r)
@@ -85,8 +85,8 @@ func (h *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 // @Param		limit	query		int	false	"Items per page"	default(10)
 // @Param		offset	query		int	false	"Skip items"		default(0)
 // @Success	200		{object}	response.ListUsersResponse
-// @Failure	400		{object}	apperror.AppError
-// @Failure	500		{object}	apperror.AppError
+// @Failure	400		{object}	error.DomainError
+// @Failure	500		{object}	error.DomainError
 // @Router		/users [get]
 func (h *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 	limit, offset, err := request.DecodeListUserRequest(r)
@@ -116,9 +116,9 @@ func (h *UserHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Param		id		path		string							true	"User ID"	format(uuid)
 // @Param		body	body		request.UpdateUserRequestBody	true	"User data"
 // @Success	200		{object}	response.UpdateUserResponse
-// @Failure	400		{object}	apperror.AppError
-// @Failure	404		{object}	apperror.AppError
-// @Failure	500		{object}	apperror.AppError
+// @Failure	400		{object}	error.DomainError
+// @Failure	404		{object}	error.DomainError
+// @Failure	500		{object}	error.DomainError
 // @Router		/users/{id} [put]
 func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	params := &request.UpdateUserParams{
@@ -150,9 +150,9 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Produce	json
 // @Param		id	path		string	true	"User ID"	format(uuid)
 // @Success	200	{object}	response.DeleteUserResponse
-// @Failure	400	{object}	apperror.AppError
-// @Failure	404	{object}	apperror.AppError
-// @Failure	500	{object}	apperror.AppError
+// @Failure	400	{object}	error.DomainError
+// @Failure	404	{object}	error.DomainError
+// @Failure	500	{object}	error.DomainError
 // @Router		/users/{id} [delete]
 func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	params, err := request.DecodeDeleteUserRequest(r)

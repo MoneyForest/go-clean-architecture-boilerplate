@@ -62,7 +62,7 @@
                     "503": {
                         "description": "Service Unavailable",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -106,13 +106,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -149,13 +149,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -193,19 +193,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -250,19 +250,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -298,19 +298,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -318,12 +318,12 @@
         }
     },
     "definitions": {
-        "apperror.AppError": {
+        "error.DomainError": {
             "type": "object",
             "properties": {
                 "cause": {},
                 "code": {
-                    "$ref": "#/definitions/apperror.ErrorCode"
+                    "$ref": "#/definitions/error.ErrorCode"
                 },
                 "details": {
                     "type": "object",
@@ -334,7 +334,7 @@
                 }
             }
         },
-        "apperror.ErrorCode": {
+        "error.ErrorCode": {
             "type": "string",
             "enum": [
                 "INVALID_ARGUMENT",

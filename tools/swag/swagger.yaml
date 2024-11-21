@@ -1,17 +1,17 @@
 basePath: /api/v1
 definitions:
-  apperror.AppError:
+  error.DomainError:
     properties:
       cause: {}
       code:
-        $ref: '#/definitions/apperror.ErrorCode'
+        $ref: '#/definitions/error.ErrorCode'
       details:
         additionalProperties: true
         type: object
       message:
         type: string
     type: object
-  apperror.ErrorCode:
+  error.ErrorCode:
     enum:
     - INVALID_ARGUMENT
     - NOT_FOUND
@@ -170,7 +170,7 @@ paths:
         "503":
           description: Service Unavailable
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
       summary: Get deep health status
       tags:
       - health
@@ -199,11 +199,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
       summary: List all users
       tags:
       - users
@@ -227,11 +227,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
       summary: Create a new user
       tags:
       - users
@@ -256,15 +256,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
       summary: Delete user by ID
       tags:
       - users
@@ -288,15 +288,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
       summary: Get user by ID
       tags:
       - users
@@ -326,15 +326,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/apperror.AppError'
+            $ref: '#/definitions/error.DomainError'
       summary: Update user by ID
       tags:
       - users

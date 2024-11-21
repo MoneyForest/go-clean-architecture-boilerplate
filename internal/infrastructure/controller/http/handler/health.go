@@ -32,7 +32,7 @@ func (h *HealthHandler) Health(w http.ResponseWriter, r *http.Request) {
 // @Accept		json
 // @Produce	json
 // @Success	200	{object}	response.DeepHealthResponse
-// @Failure	503	{object}	apperror.AppError
+// @Failure	503	{object}	error.DomainError
 // @Router		/health/deep [get]
 func (h *HealthHandler) Deep(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)

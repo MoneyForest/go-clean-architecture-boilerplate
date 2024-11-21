@@ -68,7 +68,7 @@ const docTemplate = `{
                     "503": {
                         "description": "Service Unavailable",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -112,13 +112,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -155,13 +155,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -199,19 +199,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -256,19 +256,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -304,19 +304,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/apperror.AppError"
+                            "$ref": "#/definitions/error.DomainError"
                         }
                     }
                 }
@@ -324,12 +324,12 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "apperror.AppError": {
+        "error.DomainError": {
             "type": "object",
             "properties": {
                 "cause": {},
                 "code": {
-                    "$ref": "#/definitions/apperror.ErrorCode"
+                    "$ref": "#/definitions/error.ErrorCode"
                 },
                 "details": {
                     "type": "object",
@@ -340,7 +340,7 @@ const docTemplate = `{
                 }
             }
         },
-        "apperror.ErrorCode": {
+        "error.ErrorCode": {
             "type": "string",
             "enum": [
                 "INVALID_ARGUMENT",
