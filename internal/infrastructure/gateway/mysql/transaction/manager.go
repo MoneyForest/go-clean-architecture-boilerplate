@@ -7,7 +7,7 @@ import (
 )
 
 type MySQLTransactionManager interface {
-	DoInTx(ctx context.Context, fn func(ctx context.Context) error) error
+	Do(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
 type mysqlTransactionManager struct {
@@ -18,7 +18,7 @@ func NewMySQLTransactionManager(db *sql.DB) MySQLTransactionManager {
 	return &mysqlTransactionManager{db: db}
 }
 
-func (t *mysqlTransactionManager) DoInTx(ctx context.Context, fn func(ctx context.Context) error) error {
+func (t *mysqlTransactionManager) Do(ctx context.Context, fn func(ctx context.Context) error) error {
 	tx, err := t.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err

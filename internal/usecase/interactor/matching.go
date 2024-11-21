@@ -26,7 +26,7 @@ func NewMatchingInteractor(txManager transaction.Manager, repo repository.Matchi
 
 func (i MatchingInteractor) Create(ctx context.Context, input *port.CreateMatchingInput) (*port.CreateMatchingOutput, error) {
 	var createdMatching *model.Matching
-	err := i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+	err := i.txManager.Do(ctx, func(ctx context.Context) error {
 		matching, err := i.service.CreateMatching(ctx, input.MeID, input.PartnerID)
 		if err != nil {
 			return err
@@ -48,7 +48,7 @@ func (i MatchingInteractor) Accept(ctx context.Context, input *port.AcceptMatchi
 	matching.Accept()
 
 	var updatedMatching *model.Matching
-	err = i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+	err = i.txManager.Do(ctx, func(ctx context.Context) error {
 		updatedMatching, err = i.repo.Save(ctx, matching)
 		return err
 	})
@@ -66,7 +66,7 @@ func (i MatchingInteractor) Reject(ctx context.Context, input *port.RejectMatchi
 	matching.Reject()
 
 	var updatedMatching *model.Matching
-	err = i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+	err = i.txManager.Do(ctx, func(ctx context.Context) error {
 		updatedMatching, err = i.repo.Save(ctx, matching)
 		return err
 	})

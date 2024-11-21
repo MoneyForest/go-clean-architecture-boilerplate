@@ -41,7 +41,7 @@ func (i UserInteractor) Create(ctx context.Context, input *port.CreateUserInput)
 	}
 
 	var createdUser *model.User
-	err := i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+	err := i.txManager.Do(ctx, func(ctx context.Context) error {
 		var err error
 		createdUser, err = i.repo.Save(ctx, user)
 		return err
@@ -88,7 +88,7 @@ func (i UserInteractor) Update(ctx context.Context, input *port.UpdateUserInput)
 	}
 
 	var updatedUser *model.User
-	err := i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+	err := i.txManager.Do(ctx, func(ctx context.Context) error {
 		var err error
 		updatedUser, err = i.repo.Save(ctx, user)
 		return err
@@ -104,7 +104,7 @@ func (i UserInteractor) Update(ctx context.Context, input *port.UpdateUserInput)
 
 func (i UserInteractor) Delete(ctx context.Context, input *port.DeleteUserInput) (*port.DeleteUserOutput, error) {
 	var deletedID *uuid.UUID
-	err := i.txManager.DoInTx(ctx, func(ctx context.Context) error {
+	err := i.txManager.Do(ctx, func(ctx context.Context) error {
 		var err error
 		deletedID, err = i.repo.Remove(ctx, input.ID)
 		return err
