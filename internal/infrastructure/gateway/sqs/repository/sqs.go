@@ -7,9 +7,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
+	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/dto"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
 )
 
 type SQSRepository struct {
@@ -17,22 +17,23 @@ type SQSRepository struct {
 	queueName string
 }
 
-func NewSQSRepository(sqs *sqs.Client, queueName string) SQSRepository {
-	return SQSRepository{sqs: sqs, queueName: queueName}
+func NewSQSRepository(sqs *sqs.Client, queueName string) repository.MessageQueueRepository {
+	return &SQSRepository{sqs: sqs, queueName: queueName}
 }
 
-func (r SQSRepository) SendMessage(ctx context.Context, message *entity.Message) error {
+func (r *SQSRepository) SendMessage(ctx context.Context, message *model.Message) error {
+	messageEntity := dto.ToMessageEntity(message)
 	input := &sqs.SendMessageInput{
 		QueueUrl:          aws.String(r.queueName),
-		MessageBody:       aws.String(message.Body),
-		MessageAttributes: dto.ToSQSMessageAttributes(message.MessageAttributes),
+		MessageBody:       aws.String(messageEntity.Body),
+		MessageAttributes: dto.ToSQSMessageAttributes(messageEntity.MessageAttributes),
 	}
 
 	_, err := r.sqs.SendMessage(ctx, input)
 	return err
 }
 
-func (r SQSRepository) ReceiveMessage(ctx context.Context, opts *repository.ReceiveMessageOptions) ([]*entity.Message, error) {
+func (r *SQSRepository) ReceiveMessage(ctx context.Context, opts *repository.ReceiveMessageOptions) ([]*model.Message, error) {
 	if opts == nil {
 		opts = &repository.ReceiveMessageOptions{
 			MaxNumberOfMessages: 10,
@@ -58,72 +59,19 @@ func (r SQSRepository) ReceiveMessage(ctx context.Context, opts *repository.Rece
 		return nil, err
 	}
 
-	messages := make([]*entity.Message, len(output.Messages))
+	messages := make([]*model.Message, len(output.Messages))
 	for i, msg := range output.Messages {
-		messages[i] = dto.FromSQSMessage(msg)
+		messageEntity := dto.FromSQSMessage(msg)
+		messages[i] = dto.ToMessageModel(messageEntity)
 	}
 
 	return messages, nil
 }
 
-func (r SQSRepository) DeleteMessage(ctx context.Context, receiptHandle string) error {
+func (r *SQSRepository) DeleteMessage(ctx context.Context, receiptHandle string) error {
 	_, err := r.sqs.DeleteMessage(ctx, &sqs.DeleteMessageInput{
 		QueueUrl:      aws.String(r.queueName),
 		ReceiptHandle: aws.String(receiptHandle),
 	})
-	return err
-}
-
-func (r SQSRepository) ChangeMessageVisibility(ctx context.Context, queueURL string, receiptHandle string, visibilityTimeout int32) error {
-	_, err := r.sqs.ChangeMessageVisibility(ctx, &sqs.ChangeMessageVisibilityInput{
-		QueueUrl:          aws.String(r.queueName),
-		ReceiptHandle:     aws.String(receiptHandle),
-		VisibilityTimeout: visibilityTimeout,
-	})
-	return err
-}
-
-func (r SQSRepository) SendMessageBatch(ctx context.Context, messages []*entity.Message) error {
-	if len(messages) == 0 {
-		return nil
-	}
-
-	entries := make([]types.SendMessageBatchRequestEntry, len(messages))
-	for i, msg := range messages {
-		entries[i] = types.SendMessageBatchRequestEntry{
-			Id:                aws.String(msg.MessageId),
-			MessageBody:       aws.String(msg.Body),
-			MessageAttributes: dto.ToSQSMessageAttributes(msg.MessageAttributes),
-		}
-	}
-
-	input := &sqs.SendMessageBatchInput{
-		QueueUrl: aws.String(r.queueName),
-		Entries:  entries,
-	}
-
-	_, err := r.sqs.SendMessageBatch(ctx, input)
-	return err
-}
-
-func (r SQSRepository) DeleteMessageBatch(ctx context.Context, messages []*entity.Message) error {
-	if len(messages) == 0 {
-		return nil
-	}
-
-	entries := make([]types.DeleteMessageBatchRequestEntry, len(messages))
-	for i, msg := range messages {
-		entries[i] = types.DeleteMessageBatchRequestEntry{
-			Id:            aws.String(msg.MessageId),
-			ReceiptHandle: aws.String(msg.ReceiptHandle),
-		}
-	}
-
-	input := &sqs.DeleteMessageBatchInput{
-		QueueUrl: aws.String(r.queueName),
-		Entries:  entries,
-	}
-
-	_, err := r.sqs.DeleteMessageBatch(ctx, input)
 	return err
 }

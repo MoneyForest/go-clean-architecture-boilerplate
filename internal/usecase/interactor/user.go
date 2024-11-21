@@ -9,7 +9,6 @@ import (
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/model"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/repository"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/domain/transaction"
-	"github.com/MoneyForest/go-clean-boilerplate/internal/infrastructure/gateway/sqs/entity"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/input"
 	"github.com/MoneyForest/go-clean-boilerplate/internal/usecase/port/output"
 	"github.com/MoneyForest/go-clean-boilerplate/pkg/uuid"
@@ -28,14 +27,14 @@ type userInteractor struct {
 	txManager transaction.Manager
 	repo      repository.UserRepository
 	cache     repository.UserCacheRepository
-	msgQueue  repository.UserMessageQueueRepository
+	msgQueue  repository.MessageQueueRepository
 }
 
 func NewUserInteractor(
 	txManager transaction.Manager,
 	repo repository.UserRepository,
 	cache repository.UserCacheRepository,
-	msgQueue repository.UserMessageQueueRepository,
+	msgQueue repository.MessageQueueRepository,
 ) UserInteractor {
 	return &userInteractor{
 		repo:      repo,
@@ -135,7 +134,7 @@ func (i *userInteractor) ProcessMessage(ctx context.Context, input *input.Proces
 		return nil, err
 	}
 
-	if err := i.msgQueue.SendMessage(ctx, &entity.Message{
+	if err := i.msgQueue.SendMessage(ctx, &model.Message{
 		Body: string(userIDBytes),
 	}); err != nil {
 		return nil, err
