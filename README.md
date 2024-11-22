@@ -151,8 +151,70 @@ graph TD
 | | Documentation | OpenAPI (API documentation) |
 | **Database & Caching** | PDatabase | MySQL 8.0 |
 | | Cache | Redis |
-| | ORM | database/sql |
+| | ORM | sqlc |
 | **Infrastructure & Cloud** | Container | Docker |
 | | Message Queue | AWS SQS |
 | | CI/CD | GitHub Actions |
 | **Tools** | Documentation Generator | Swag (Generate OpenAPI documentation) |
+
+## Development Flow
+
+1. Define Domain Model
+
+2. Define Repository Interface
+
+3. Define Usecase
+
+4. Define Controller
+
+5. Define Schema & Query
+
+6. Generate sqlc code
+
+7. Implement Repository
+
+8. Implement Handler
+
+9. Generate OpenAPI
+
+## Code Generation
+
+### swag
+
+1. Define controller
+
+   Put controller files in the `internal/infrastructure/controller/http/handler` directory.
+   Example: `user.go`, `matching.go`, etc.
+
+2. Annotate controller
+
+   Add comments to the controller files to generate OpenAPI documentation.
+   Example: `user.go`, `matching.go`, etc.
+
+3. Generate OpenAPI documentation
+
+   ```sh
+   make swag-gen
+   ```
+
+### sqlc
+
+1. Define schema
+
+   Put schema files in the `internal/infrastructure/gateway/mysql/sqlc/schema/` directory.
+   Example: `001_user.sql`, `002_matching.sql`, etc.
+
+2. Define query
+   Put query files in the `internal/infrastructure/gateway/mysql/sqlc/query/` directory.
+   Example: `user.sql`, `matching.sql`, etc.
+
+3. Generate code
+   Run the following command to generate code.
+
+   ```sh
+   make sqlc-gen
+   ```
+
+4. Define repository interface & implement repository
+   - Define repository interface in the `domain/repository` directory.
+   - Implement the repository in the `infrastructure/gateway/mysql/repository` directory.

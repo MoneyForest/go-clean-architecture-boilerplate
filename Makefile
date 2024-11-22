@@ -41,6 +41,10 @@ swagger-gen:
 	swag init -g cmd/main.go -o tools/swag && \
 	swag fmt
 
+.PHONY: sqlc-gen
+sqlc-gen:
+	sqlc generate
+
 .PHONY: docker-clean-and-up
 docker-clean-and-up:
 	docker compose down -v && docker compose up -d --build

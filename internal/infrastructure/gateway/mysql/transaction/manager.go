@@ -1,38 +1,38 @@
+// internal/infrastructure/gateway/mysql/transaction/manager.go
 package transaction
 
 import (
 	"context"
 	"database/sql"
-	"log"
+	"fmt"
 )
-
-type MySQLTransactionManager interface {
-	Do(ctx context.Context, fn func(ctx context.Context) error) error
-}
 
 type mysqlTransactionManager struct {
 	db *sql.DB
 }
 
-func NewMySQLTransactionManager(db *sql.DB) MySQLTransactionManager {
+func NewMySQLTransactionManager(db *sql.DB) *mysqlTransactionManager {
 	return &mysqlTransactionManager{db: db}
 }
 
-func (t *mysqlTransactionManager) Do(ctx context.Context, fn func(ctx context.Context) error) error {
-	tx, err := t.db.BeginTx(ctx, nil)
+func (m *mysqlTransactionManager) Do(ctx context.Context, fn func(ctx context.Context) error) error {
+	tx, err := m.db.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("begin transaction: %w", err)
 	}
 
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			log.Printf("failed to rollback transaction: %v\n", err)
+	ctxWithTx := context.WithValue(ctx, txKey{}, tx)
+
+	if err := fn(ctxWithTx); err != nil {
+		if rbErr := tx.Rollback(); rbErr != nil {
+			return fmt.Errorf("rollback transaction: %v, original error: %w", rbErr, err)
 		}
-	}()
-
-	if err := fn(context.WithValue(ctx, "tx", tx)); err != nil {
 		return err
 	}
 
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit transaction: %w", err)
+	}
+
+	return nil
 }
