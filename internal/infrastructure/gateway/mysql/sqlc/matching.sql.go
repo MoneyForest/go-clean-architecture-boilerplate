@@ -68,12 +68,10 @@ func (q *Queries) ExistsMatching(ctx context.Context, id string) (bool, error) {
 }
 
 const GetMatching = `-- name: GetMatching :one
-
 SELECT id, me_id, partner_id, status, created_at, updated_at FROM ` + "`" + `matching` + "`" + `
 WHERE id = ? LIMIT 1
 `
 
-// internal/infrastructure/gateway/mysql/sqlc/query/matching.sql
 func (q *Queries) GetMatching(ctx context.Context, id string) (Matching, error) {
 	row := q.db.QueryRowContext(ctx, GetMatching, id)
 	var i Matching

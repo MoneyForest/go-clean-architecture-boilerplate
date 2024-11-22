@@ -17,7 +17,6 @@ type Querier interface {
 	DeleteUser(ctx context.Context, id string) error
 	ExistsMatching(ctx context.Context, id string) (bool, error)
 	ExistsUser(ctx context.Context, id string) (bool, error)
-	// internal/infrastructure/gateway/mysql/sqlc/query/matching.sql
 	GetMatching(ctx context.Context, id string) (Matching, error)
 	GetMatchingByParticipants(ctx context.Context, arg GetMatchingByParticipantsParams) (Matching, error)
 	GetUser(ctx context.Context, id string) (User, error)

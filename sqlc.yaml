@@ -1,7 +1,7 @@
 version: "2"
 sql:
-  - schema: "internal/infrastructure/gateway/mysql/sqlc/schema"
-    queries: "internal/infrastructure/gateway/mysql/sqlc/query"
+  - schema: "internal/infrastructure/gateway/mysql/schema"
+    queries: "internal/infrastructure/gateway/mysql/query"
     engine: "mysql"
     gen:
       go:
