@@ -1,21 +1,17 @@
 package model
 
 import (
-	"errors"
 	"time"
 
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
-)
-
-var (
-	ErrUserEmailIsRequired = errors.New("user email is required")
+	"github.com/go-playground/validator/v10"
 )
 
 type User struct {
-	ID        uuid.UUID
-	Email     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uuid.UUID `validate:"required"`
+	Email     string    `validate:"required,email"`
+	CreatedAt time.Time `validate:"required"`
+	UpdatedAt time.Time `validate:"required"`
 }
 
 type InputUserParams struct {
@@ -36,8 +32,9 @@ func NewUser(params InputUserParams) *User {
 }
 
 func (u *User) Validate() error {
-	if u.Email == "" {
-		return ErrUserEmailIsRequired
+	validate := validator.New()
+	if err := validate.Struct(u); err != nil {
+		return err
 	}
 	return nil
 }

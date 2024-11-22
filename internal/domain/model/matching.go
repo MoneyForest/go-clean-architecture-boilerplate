@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
+	"github.com/go-playground/validator/v10"
 )
 
 var (
@@ -27,12 +28,12 @@ var MatchingStatuses = map[MatchingStatus]struct{}{
 }
 
 type Matching struct {
-	ID        uuid.UUID
-	MeID      uuid.UUID
-	PartnerID uuid.UUID
-	Status    MatchingStatus
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uuid.UUID      `validate:"required"`
+	MeID      uuid.UUID      `validate:"required"`
+	PartnerID uuid.UUID      `validate:"required"`
+	Status    MatchingStatus `validate:"required,matching_status"`
+	CreatedAt time.Time      `validate:"required"`
+	UpdatedAt time.Time      `validate:"required"`
 }
 
 type InputMatchingParams struct {
@@ -57,16 +58,23 @@ func NewMatching(params InputMatchingParams) *Matching {
 }
 
 func (m *Matching) Validate() error {
-	if m.MeID == uuid.Nil() || m.PartnerID == uuid.Nil() {
-		return ErrMatchingMeOrPartnerIDIsRequired
+	validate := validator.New()
+	if err := validate.RegisterValidation("matching_status", validateMatchingStatus); err != nil {
+		return err
 	}
-	if m.Status == "" {
-		return ErrMatchingStatusIsRequired
-	}
-	if _, ok := MatchingStatuses[m.Status]; !ok {
-		return ErrMatchingStatusIsInvalid
+	if err := validate.Struct(m); err != nil {
+		return err
 	}
 	return nil
+}
+
+func validateMatchingStatus(fl validator.FieldLevel) bool {
+	status, ok := fl.Field().Interface().(MatchingStatus)
+	if !ok {
+		return false
+	}
+	_, exists := MatchingStatuses[status]
+	return exists
 }
 
 func (m *Matching) Accept() {

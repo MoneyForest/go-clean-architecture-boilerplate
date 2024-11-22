@@ -69,59 +69,74 @@ func TestValidateMatching(t *testing.T) {
 	tests := []struct {
 		name     string
 		matching *Matching
-		wantErr  error
+		wantErr  bool
 	}{
 		{
 			name: "success: valid matching",
 			matching: &Matching{
+				ID:        uuid.New(),
 				MeID:      meID,
 				PartnerID: partnerID,
 				Status:    MatchingStatusPending,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
-			wantErr: nil,
+			wantErr: false,
 		},
 		{
 			name: "error: empty meID",
 			matching: &Matching{
+				ID:        uuid.New(),
 				MeID:      uuid.Nil(),
 				PartnerID: partnerID,
 				Status:    MatchingStatusPending,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
-			wantErr: ErrMatchingMeOrPartnerIDIsRequired,
+			wantErr: true,
 		},
 		{
 			name: "error: empty partnerID",
 			matching: &Matching{
+				ID:        uuid.New(),
 				MeID:      meID,
 				PartnerID: uuid.Nil(),
 				Status:    MatchingStatusPending,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
-			wantErr: ErrMatchingMeOrPartnerIDIsRequired,
+			wantErr: true,
 		},
 		{
 			name: "error: empty status",
 			matching: &Matching{
+				ID:        uuid.New(),
 				MeID:      meID,
 				PartnerID: partnerID,
 				Status:    "",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
-			wantErr: ErrMatchingStatusIsRequired,
+			wantErr: true,
 		},
 		{
 			name: "error: invalid status",
 			matching: &Matching{
+				ID:        uuid.New(),
 				MeID:      meID,
 				PartnerID: partnerID,
 				Status:    "invalid",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
-			wantErr: ErrMatchingStatusIsInvalid,
+			wantErr: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.matching.Validate()
-			if err != tt.wantErr {
+			if (err != nil) != tt.wantErr {
 				t.Errorf("ValidateMatching() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
@@ -57,28 +58,34 @@ func TestValidateUser(t *testing.T) {
 	tests := []struct {
 		name    string
 		user    *User
-		wantErr error
+		wantErr bool
 	}{
 		{
 			name: "success: valid user with email",
 			user: &User{
-				Email: "test@example.com",
+				ID:        uuid.New(),
+				Email:     "test@example.com",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
-			wantErr: nil,
+			wantErr: false,
 		},
 		{
-			name: "error: empty email",
+			name: "error: invalid email",
 			user: &User{
-				Email: "",
+				ID:        uuid.New(),
+				Email:     "invalid-email",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			},
-			wantErr: ErrUserEmailIsRequired,
+			wantErr: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.user.Validate()
-			if err != tt.wantErr {
+			if (err != nil) != tt.wantErr {
 				t.Errorf("ValidateUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
