@@ -1,5 +1,3 @@
--- internal/infrastructure/gateway/mysql/sqlc/query/matching.sql
-
 -- name: GetMatching :one
 SELECT * FROM `matching`
 WHERE id = ? LIMIT 1;
