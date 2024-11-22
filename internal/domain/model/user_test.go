@@ -19,7 +19,7 @@ func TestNewUser(t *testing.T) {
 		want *User
 	}{
 		{
-			name: "success: user is created successfully",
+			name: "OK: user is created successfully",
 			args: args{
 				params: InputUserParams{
 					Email: "test@example.com",
@@ -61,7 +61,7 @@ func TestValidateUser(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "success: valid user with email",
+			name: "OK: valid user with email",
 			user: &User{
 				ID:        uuid.New(),
 				Email:     "test@example.com",
@@ -71,7 +71,7 @@ func TestValidateUser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "error: invalid email",
+			name: "NG: invalid email",
 			user: &User{
 				ID:        uuid.New(),
 				Email:     "invalid-email",

@@ -13,26 +13,39 @@ import (
 type MatchingInteractor struct {
 	txManager transaction.Manager
 	repo      repository.MatchingRepository
+	userRepo  repository.UserRepository
 	service   *service.MatchingDomainService
 }
 
-func NewMatchingInteractor(txManager transaction.Manager, repo repository.MatchingRepository, ds *service.MatchingDomainService) MatchingInteractor {
+func NewMatchingInteractor(txManager transaction.Manager, repo repository.MatchingRepository, userRepo repository.UserRepository, service *service.MatchingDomainService) MatchingInteractor {
 	return MatchingInteractor{
 		txManager: txManager,
 		repo:      repo,
-		service:   ds,
+		userRepo:  userRepo,
+		service:   service,
 	}
 }
 
 func (i MatchingInteractor) Create(ctx context.Context, input *port.CreateMatchingInput) (*port.CreateMatchingOutput, error) {
 	var createdMatching *model.Matching
 	err := i.txManager.Do(ctx, func(ctx context.Context) error {
-		matching, err := i.service.CreateMatching(ctx, input.MeID, input.PartnerID)
+		me, err := i.userRepo.FindById(ctx, input.MeID)
 		if err != nil {
 			return err
 		}
-		createdMatching = matching
-		return nil
+		partner, err := i.userRepo.FindById(ctx, input.PartnerID)
+		if err != nil {
+			return err
+		}
+		if err := i.service.ValidateMatching(ctx, me, partner); err != nil {
+			return err
+		}
+		createdMatching = model.NewMatching(model.InputMatchingParams{
+			MeID:      input.MeID,
+			PartnerID: input.PartnerID,
+		})
+		createdMatching, err = i.repo.Save(ctx, createdMatching)
+		return err
 	})
 	if err != nil {
 		return nil, err
@@ -45,7 +58,9 @@ func (i MatchingInteractor) Accept(ctx context.Context, input *port.AcceptMatchi
 	if err != nil {
 		return nil, err
 	}
-	matching.Accept()
+	if err := matching.Accept(); err != nil {
+		return nil, err
+	}
 
 	var updatedMatching *model.Matching
 	err = i.txManager.Do(ctx, func(ctx context.Context) error {
@@ -63,7 +78,9 @@ func (i MatchingInteractor) Reject(ctx context.Context, input *port.RejectMatchi
 	if err != nil {
 		return nil, err
 	}
-	matching.Reject()
+	if err := matching.Reject(); err != nil {
+		return nil, err
+	}
 
 	var updatedMatching *model.Matching
 	err = i.txManager.Do(ctx, func(ctx context.Context) error {

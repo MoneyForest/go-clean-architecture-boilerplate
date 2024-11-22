@@ -72,7 +72,7 @@ func TestValidateMatching(t *testing.T) {
 		wantErr  bool
 	}{
 		{
-			name: "success: valid matching",
+			name: "OK: valid matching",
 			matching: &Matching{
 				ID:        uuid.New(),
 				MeID:      meID,
@@ -84,7 +84,7 @@ func TestValidateMatching(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "error: empty meID",
+			name: "NG: empty meID",
 			matching: &Matching{
 				ID:        uuid.New(),
 				MeID:      uuid.Nil(),
@@ -96,7 +96,7 @@ func TestValidateMatching(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "error: empty partnerID",
+			name: "NG: empty partnerID",
 			matching: &Matching{
 				ID:        uuid.New(),
 				MeID:      meID,
@@ -108,7 +108,7 @@ func TestValidateMatching(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "error: empty status",
+			name: "NG: empty status",
 			matching: &Matching{
 				ID:        uuid.New(),
 				MeID:      meID,
@@ -120,7 +120,7 @@ func TestValidateMatching(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "error: invalid status",
+			name: "NG: invalid status",
 			matching: &Matching{
 				ID:        uuid.New(),
 				MeID:      meID,
@@ -138,6 +138,70 @@ func TestValidateMatching(t *testing.T) {
 			err := tt.matching.Validate()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ValidateMatching() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestMatching_Accept(t *testing.T) {
+	tests := []struct {
+		name     string
+		matching *Matching
+		wantErr  bool
+	}{
+		{
+			name: "OK: matching status is pending",
+			matching: &Matching{
+				Status: MatchingStatusPending,
+			},
+			wantErr: false,
+		},
+		{
+			name: "NG: matching status is not pending",
+			matching: &Matching{
+				Status: MatchingStatusAccepted,
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.matching.Accept()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Accept() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestMatching_Reject(t *testing.T) {
+	tests := []struct {
+		name     string
+		matching *Matching
+		wantErr  bool
+	}{
+		{
+			name: "OK: matching status is pending",
+			matching: &Matching{
+				Status: MatchingStatusPending,
+			},
+			wantErr: false,
+		},
+		{
+			name: "NG: matching status is not pending",
+			matching: &Matching{
+				Status: MatchingStatusRejected,
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.matching.Reject()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Reject() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

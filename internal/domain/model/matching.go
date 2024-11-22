@@ -12,6 +12,7 @@ var (
 	ErrMatchingMeOrPartnerIDIsRequired = errors.New("matching me or partner id is required")
 	ErrMatchingStatusIsRequired        = errors.New("matching status is required")
 	ErrMatchingStatusIsInvalid         = errors.New("matching status is invalid")
+	ErrMatchingStatusIsNotPending      = errors.New("matching status is not pending")
 )
 
 type MatchingStatus string
@@ -25,6 +26,7 @@ const (
 var MatchingStatuses = map[MatchingStatus]struct{}{
 	MatchingStatusPending:  {},
 	MatchingStatusAccepted: {},
+	MatchingStatusRejected: {},
 }
 
 type Matching struct {
@@ -77,10 +79,18 @@ func validateMatchingStatus(fl validator.FieldLevel) bool {
 	return exists
 }
 
-func (m *Matching) Accept() {
+func (m *Matching) Accept() error {
+	if m.Status != MatchingStatusPending {
+		return ErrMatchingStatusIsNotPending
+	}
 	m.Status = MatchingStatusAccepted
+	return nil
 }
 
-func (m *Matching) Reject() {
+func (m *Matching) Reject() error {
+	if m.Status != MatchingStatusPending {
+		return ErrMatchingStatusIsNotPending
+	}
 	m.Status = MatchingStatusRejected
+	return nil
 }

@@ -17,15 +17,15 @@ func SetupTestMatchingInteractor(ctx context.Context, gw *testhelper.Gateway) (M
 	txManager := transaction.NewMySQLTransactionManager(gw.MySQLClient)
 	matchingRepo := repository.NewMatchingMySQLRepository(gw.MySQLClient)
 	userRepo := repository.NewUserMySQLRepository(gw.MySQLClient)
-	ds := service.NewMatchingDomainService(userRepo, matchingRepo)
-	return NewMatchingInteractor(txManager, matchingRepo, ds), userRepo
+	ds := &service.MatchingDomainService{}
+	return NewMatchingInteractor(txManager, matchingRepo, userRepo, ds), userRepo
 }
 
 func createTestUser(ctx context.Context, t *testing.T, userRepo *repository.UserMySQLRepository) *model.User {
-	ID := uuid.New()
+	id := uuid.New()
 	user := model.NewUser(model.InputUserParams{
-		ID:    ID,
-		Email: ID.String() + "@example.com",
+		ID:    id,
+		Email: id.String() + "@example.com",
 	})
 	createdUser, err := userRepo.Save(ctx, user)
 	if err != nil {

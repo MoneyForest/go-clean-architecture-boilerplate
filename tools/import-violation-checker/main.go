@@ -66,6 +66,20 @@ func checkImportViolation(dir, path, importPath string) string {
 		case strings.Contains(importPath, "internal/infrastructure"):
 			return fmt.Sprintf("Domain layer should not import infrastructure layer: %s imports %s\n", path, importPath)
 		}
+		switch {
+		case strings.HasPrefix(dir, "internal/domain/model"):
+			switch {
+			case strings.Contains(importPath, "internal/domain/repository"):
+				return fmt.Sprintf("Domain Model should not import repository interface: %s imports %s\n", path, importPath)
+			}
+		}
+		switch {
+		case strings.HasPrefix(dir, "internal/domain/service"):
+			switch {
+			case strings.Contains(importPath, "internal/domain/repository"):
+				return fmt.Sprintf("Domain Service should not import repository interface: %s imports %s\n", path, importPath)
+			}
+		}
 		return ""
 	case strings.HasPrefix(dir, "internal/usecase"):
 		switch {

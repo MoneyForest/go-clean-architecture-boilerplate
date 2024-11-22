@@ -27,10 +27,10 @@ func NewUserInteractor(
 	msgQueue repository.MessageQueueRepository,
 ) UserInteractor {
 	return UserInteractor{
+		txManager: txManager,
 		repo:      repo,
 		cache:     cache,
 		msgQueue:  msgQueue,
-		txManager: txManager,
 	}
 }
 

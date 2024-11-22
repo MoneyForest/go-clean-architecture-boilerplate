@@ -2,43 +2,29 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/model"
-	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/repository"
-	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 )
 
-type MatchingDomainService struct {
-	userRepo     repository.UserRepository
-	matchingRepo repository.MatchingRepository
-}
+var (
+	ErrMatchingMeAndPartnerAreSameUser = errors.New("me and partner are the same user")
+)
 
-func NewMatchingDomainService(ur repository.UserRepository, mr repository.MatchingRepository) *MatchingDomainService {
-	return &MatchingDomainService{
-		userRepo:     ur,
-		matchingRepo: mr,
-	}
-}
+type MatchingDomainService struct{}
 
-func (s *MatchingDomainService) CreateMatching(ctx context.Context, meID, partnerID uuid.UUID) (*model.Matching, error) {
-	me, err := s.userRepo.FindById(ctx, meID)
-	if err != nil {
-		return nil, err
+func (s *MatchingDomainService) ValidateMatching(ctx context.Context, me, partner *model.User) error {
+	// Write the business logic for the match.
+	// For example, a match for an unsubscribed user or a user who violates the Terms of Service is invalid.
+	// It can only be validated by a call to the domain model.
+	if err := me.Validate(); err != nil {
+		return err
 	}
-	partner, err := s.userRepo.FindById(ctx, partnerID)
-	if err != nil {
-		return nil, err
+	if err := partner.Validate(); err != nil {
+		return err
 	}
-
-	matching := model.NewMatching(model.InputMatchingParams{
-		MeID:      me.ID,
-		PartnerID: partner.ID,
-		Status:    "pending",
-	})
-	createdMatching, err := s.matchingRepo.Save(ctx, matching)
-	if err != nil {
-		return nil, err
+	if me.ID == partner.ID {
+		return ErrMatchingMeAndPartnerAreSameUser
 	}
-
-	return createdMatching, nil
+	return nil
 }
