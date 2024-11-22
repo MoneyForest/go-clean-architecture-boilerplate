@@ -85,15 +85,13 @@ graph TD
 
 1. **Domain Layer** (`internal/domain`) - Innermost layer
    - Defines pure business logic independent of external implementations
-   - `domain/model`: Core business entities and rules
+   - `domain/model`: Core domain logic and business rules and structures
    - `domain/repository`: Interfaces defining operations on domain models
    - `domain/service`: Contains multiple domain logic and business rules
 
 2. **Usecase Layer** (`internal/usecase`) - Middle layer
    - Implements application-specific use cases
    - Transaction management
-   - Input/Output port separation for clean boundaries
-   - Data transformation between layers
    - `usecase/interactor`: Implements business logic that operates on domain models
    - `usecase/port`: Defines input and output ports
 
@@ -146,16 +144,16 @@ graph TD
 | Category | Component | Details |
 |----------|-----------|----------|
 | **Backend** | Architecture | Clean Architecture |
-| | Language | Go |
-| | Framework | • Chi (HTTP router and dispatcher)<br>• Cobra (Command-line framework) |
-| | Documentation | OpenAPI (API documentation) |
-| **Database & Caching** | PDatabase | MySQL 8.0 |
-| | Cache | Redis |
-| | ORM | sqlc |
-| **Infrastructure & Cloud** | Container | Docker |
-| | Message Queue | AWS SQS |
-| | CI/CD | GitHub Actions |
-| **Tools** | Documentation Generator | Swag (Generate OpenAPI documentation) |
+| | Language | [Go](https://github.com/golang/go) |
+| | Framework | • [Chi](https://github.com/go-chi/chi) (HTTP router and dispatcher)<br>• [Cobra](https://github.com/spf13/cobra) (Command-line framework) |
+| | API Documentation | [OpenAPI](https://github.com/OAI/OpenAPI-Specification) |
+| **Database & Caching** | Database | [MySQL](https://dev.mysql.com/) |
+| | Cache | [Redis](https://redis.io/) |
+| | ORM | [sqlc](https://github.com/sqlc-dev/sqlc) |
+| **Infrastructure & Cloud** | Container | [Docker](https://www.docker.com/) |
+| | Message Queue | [AWS SQS](https://aws.amazon.com/sqs/) |
+| | CI/CD | [GitHub Actions](https://github.com/features/actions) |
+| **Tools** | Documentation Generator | [swag](https://github.com/swaggo/swag) |
 
 ## Development Flow
 
@@ -165,17 +163,13 @@ graph TD
 
 3. Define Usecase
 
-4. Define Controller
+4. Define Schema & Query
 
-5. Define Schema & Query
+5. Generate sqlc code
 
-6. Generate sqlc code
+6. Implement Repository
 
-7. Implement Repository
-
-8. Implement Handler
-
-9. Generate OpenAPI
+7. Implement Handler or Command
 
 ## Code Generation
 
