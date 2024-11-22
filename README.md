@@ -157,6 +157,26 @@ graph TD
 | | CI/CD | GitHub Actions |
 | **Tools** | Documentation Generator | Swag (Generate OpenAPI documentation) |
 
+## Development Flow
+
+1. Define Domain Model
+
+2. Define Repository Interface
+
+3. Define Usecase
+
+4. Define Controller
+
+5. Define Schema & Query
+
+6. Generate sqlc code
+
+7. Implement Repository
+
+8. Implement Handler
+
+9. Generate OpenAPI
+
 ## Code Generation
 
 ### swag
