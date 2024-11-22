@@ -18,7 +18,7 @@ func SetupTestMatchingInteractor(ctx context.Context, gw *testhelper.Gateway) (M
 	matchingRepo := repository.NewMatchingMySQLRepository(gw.MySQLClient)
 	userRepo := repository.NewUserMySQLRepository(gw.MySQLClient)
 	ds := service.NewMatchingDomainService(userRepo, matchingRepo)
-	return NewMatchingInteractor(txManager, matchingRepo, ds), &userRepo
+	return NewMatchingInteractor(txManager, matchingRepo, ds), userRepo
 }
 
 func createTestUser(ctx context.Context, t *testing.T, userRepo *repository.UserMySQLRepository) *model.User {

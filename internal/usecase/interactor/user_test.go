@@ -112,7 +112,7 @@ func TestUserInteractor_Get(t *testing.T) {
 			name:    "NotFound",
 			input:   &port.GetUserInput{ID: uuid.New()},
 			want:    nil,
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 
@@ -124,6 +124,12 @@ func TestUserInteractor_Get(t *testing.T) {
 				return
 			}
 			if tt.wantErr {
+				return
+			}
+			if got == nil {
+				if tt.want != nil {
+					t.Errorf("Get() got = nil, want %v", tt.want)
+				}
 				return
 			}
 			diff := cmp.Diff(got.User, tt.want)
@@ -342,8 +348,12 @@ func TestUserInteractor_Delete(t *testing.T) {
 				if *got.ID != tt.input.ID {
 					t.Errorf("Delete() got = %v, want %v", got.ID, tt.input.ID)
 				}
-				_, err = userInteractor.Get(ctx, &port.GetUserInput{ID: tt.input.ID})
-				if err == nil {
+				result, err := userInteractor.Get(ctx, &port.GetUserInput{ID: tt.input.ID})
+				if err != nil {
+					t.Errorf("Unexpected error checking deleted user: %v", err)
+					return
+				}
+				if result != nil && result.User != nil {
 					t.Error("Delete() user still exists after deletion")
 				}
 			}
@@ -360,13 +370,27 @@ func TestUserInteractor_ProcessMessage(t *testing.T) {
 	defer testhelper.Cleanup(ctx, gw)
 	userInteractor := SetupTestUserInteractor(ctx, gw)
 
+	testUser, err := userInteractor.Create(ctx, &port.CreateUserInput{
+		Email: "process@example.com",
+	})
+	if err != nil {
+		t.Fatalf("Failed to create test user: %v", err)
+	}
+
 	tests := []struct {
 		name    string
 		input   *port.ProcessMessageInput
 		wantErr bool
 	}{
 		{
-			name: "OK",
+			name: "OK_ExistingUser",
+			input: &port.ProcessMessageInput{
+				ID: testUser.User.ID,
+			},
+			wantErr: false,
+		},
+		{
+			name: "OK_NonExistingUser",
 			input: &port.ProcessMessageInput{
 				ID: uuid.New(),
 			},

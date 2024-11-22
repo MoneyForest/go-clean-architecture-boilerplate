@@ -49,9 +49,10 @@ func (i UserInteractor) Create(ctx context.Context, input *port.CreateUserInput)
 	if err != nil {
 		return nil, err
 	}
-
-	if err := i.cache.Store(ctx, user, 3600*time.Second); err != nil {
-		log.Printf("failed to set cache: %v\n", err)
+	if createdUser != nil {
+		if err := i.cache.Store(ctx, createdUser, 3600*time.Second); err != nil {
+			log.Printf("failed to set cache: %v\n", err)
+		}
 	}
 
 	return &port.CreateUserOutput{User: createdUser}, nil
@@ -66,10 +67,11 @@ func (i UserInteractor) Get(ctx context.Context, input *port.GetUserInput) (*por
 	if err != nil {
 		return nil, err
 	}
-	if err := i.cache.Store(ctx, user, 3600*time.Second); err != nil {
-		log.Printf("failed to set cache: %v\n", err)
+	if user != nil {
+		if err := i.cache.Store(ctx, user, 3600*time.Second); err != nil {
+			log.Printf("failed to set cache: %v\n", err)
+		}
 	}
-
 	return &port.GetUserOutput{User: user}, nil
 }
 
@@ -96,8 +98,10 @@ func (i UserInteractor) Update(ctx context.Context, input *port.UpdateUserInput)
 	if err != nil {
 		return nil, err
 	}
-	if err := i.cache.Store(ctx, user, 3600*time.Second); err != nil {
-		log.Printf("failed to set cache: %v\n", err)
+	if updatedUser != nil {
+		if err := i.cache.Store(ctx, updatedUser, 3600*time.Second); err != nil {
+			log.Printf("failed to set cache: %v\n", err)
+		}
 	}
 	return &port.UpdateUserOutput{User: updatedUser}, nil
 }
@@ -112,8 +116,10 @@ func (i UserInteractor) Delete(ctx context.Context, input *port.DeleteUserInput)
 	if err != nil {
 		return nil, err
 	}
-	if err := i.cache.Remove(ctx, input.ID); err != nil {
-		log.Printf("failed to delete cache: %v\n", err)
+	if deletedID != nil {
+		if err := i.cache.Remove(ctx, *deletedID); err != nil {
+			log.Printf("failed to delete cache: %v\n", err)
+		}
 	}
 	return &port.DeleteUserOutput{ID: deletedID}, nil
 }

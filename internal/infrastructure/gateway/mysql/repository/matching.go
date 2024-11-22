@@ -3,143 +3,128 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/domain/model"
-	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql/dto"
-	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql/entity"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql/sqlc"
+	"github.com/MoneyForest/go-clean-architecture-boilerplate/internal/infrastructure/gateway/mysql/transaction"
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 )
 
 type MatchingMySQLRepository struct {
-	db *sql.DB
+	db      *sql.DB
+	queries *sqlc.Queries
 }
 
-func NewMatchingMySQLRepository(db *sql.DB) MatchingMySQLRepository {
-	return MatchingMySQLRepository{db: db}
-}
-
-func (r MatchingMySQLRepository) Save(ctx context.Context, matching *model.Matching) (*model.Matching, error) {
-	if exists, _ := r.exists(ctx, matching.ID); exists {
-		return r.update(ctx, matching)
+func NewMatchingMySQLRepository(db *sql.DB) *MatchingMySQLRepository {
+	return &MatchingMySQLRepository{
+		db:      db,
+		queries: sqlc.New(db),
 	}
-	return r.create(ctx, matching)
 }
 
-func (r MatchingMySQLRepository) exists(ctx context.Context, id uuid.UUID) (bool, error) {
-	var exists bool
-	query := `SELECT EXISTS(SELECT 1 FROM matching WHERE id = ?)`
-	err := r.db.QueryRowContext(ctx, query, id).Scan(&exists)
-	return exists, err
-}
-
-func (r MatchingMySQLRepository) create(ctx context.Context, matching *model.Matching) (*model.Matching, error) {
-	query := `INSERT INTO matching (id, me_id, partner_id, status, created_at, updated_at)
-              VALUES (?, ?, ?, ?, ?, ?)`
-
-	_, err := r.db.ExecContext(ctx, query,
-		matching.ID, matching.MeID, matching.PartnerID,
-		matching.Status, matching.CreatedAt, matching.UpdatedAt)
+func (r *MatchingMySQLRepository) Save(ctx context.Context, matching *model.Matching) (*model.Matching, error) {
+	q := transaction.GetQueries(ctx, r.queries)
+	exists, err := q.ExistsMatching(ctx, matching.ID.String())
 	if err != nil {
 		return nil, err
 	}
 
+	if exists {
+		_, err = q.UpdateMatching(ctx, sqlc.UpdateMatchingParams{
+			Status:    string(matching.Status),
+			UpdatedAt: time.Now(),
+			ID:        matching.ID.String(),
+		})
+	} else {
+		_, err = q.CreateMatching(ctx, sqlc.CreateMatchingParams{
+			ID:        matching.ID.String(),
+			MeID:      matching.MeID.String(),
+			PartnerID: matching.PartnerID.String(),
+			Status:    string(matching.Status),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		})
+	}
+
+	if err != nil {
+		return nil, err
+	}
 	return matching, nil
 }
 
-func (r MatchingMySQLRepository) update(ctx context.Context, matching *model.Matching) (*model.Matching, error) {
-	query := `UPDATE matching
-              SET status = ?, updated_at = NOW()
-              WHERE id = ?`
-
-	_, err := r.db.ExecContext(ctx, query, matching.Status, matching.ID)
+func (r *MatchingMySQLRepository) FindAllByUser(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*model.Matching, error) {
+	q := transaction.GetQueries(ctx, r.queries)
+	matchings, err := q.ListMatchingsByUser(ctx, sqlc.ListMatchingsByUserParams{
+		MeID:      userID.String(),
+		PartnerID: userID.String(),
+		Limit:     int32(limit),
+		Offset:    int32(offset),
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	return matching, nil
-}
-
-func (r MatchingMySQLRepository) FindAllByUser(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*model.Matching, error) {
-	query := `SELECT id, me_id, partner_id, status, created_at, updated_at
-              FROM matching
-              WHERE me_id = ? OR partner_id = ?
-              LIMIT ? OFFSET ?`
-
-	var entities []*entity.MatchingEntity
-	rows, err := r.db.QueryContext(ctx, query, userID, userID, limit, offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var entity entity.MatchingEntity
-		if err := rows.Scan(
-			&entity.ID,
-			&entity.MeID,
-			&entity.PartnerID,
-			&entity.Status,
-			&entity.CreatedAt,
-			&entity.UpdatedAt,
-		); err != nil {
-			return nil, err
+	result := make([]*model.Matching, len(matchings))
+	for i, m := range matchings {
+		result[i] = &model.Matching{
+			ID:        uuid.MustParse(m.ID),
+			MeID:      uuid.MustParse(m.MeID),
+			PartnerID: uuid.MustParse(m.PartnerID),
+			Status:    model.MatchingStatus(m.Status),
+			CreatedAt: m.CreatedAt,
+			UpdatedAt: m.UpdatedAt,
 		}
-		entities = append(entities, &entity)
 	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return dto.ToMatchingModels(entities)
+	return result, nil
 }
 
-func (r MatchingMySQLRepository) FindById(ctx context.Context, id uuid.UUID) (*model.Matching, error) {
-	query := `SELECT id, me_id, partner_id, status, created_at, updated_at
-              FROM matching
-              WHERE id = ?`
-
-	var entity entity.MatchingEntity
-	err := r.db.QueryRowContext(ctx, query, id).Scan(
-		&entity.ID,
-		&entity.MeID,
-		&entity.PartnerID,
-		&entity.Status,
-		&entity.CreatedAt,
-		&entity.UpdatedAt,
-	)
+func (r *MatchingMySQLRepository) FindById(ctx context.Context, id uuid.UUID) (*model.Matching, error) {
+	q := transaction.GetQueries(ctx, r.queries)
+	matching, err := q.GetMatching(ctx, id.String())
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 
-	return dto.ToMatchingModel(&entity)
+	return &model.Matching{
+		ID:        uuid.MustParse(matching.ID),
+		MeID:      uuid.MustParse(matching.MeID),
+		PartnerID: uuid.MustParse(matching.PartnerID),
+		Status:    model.MatchingStatus(matching.Status),
+		CreatedAt: matching.CreatedAt,
+		UpdatedAt: matching.UpdatedAt,
+	}, nil
 }
 
-func (r MatchingMySQLRepository) FindByParticipants(ctx context.Context, meID, partnerID uuid.UUID) (*model.Matching, error) {
-	query := `SELECT id, me_id, partner_id, status, created_at, updated_at
-              FROM matching
-              WHERE me_id = ? AND partner_id = ?`
-
-	var entity entity.MatchingEntity
-	err := r.db.QueryRowContext(ctx, query, meID, partnerID).Scan(
-		&entity.ID,
-		&entity.MeID,
-		&entity.PartnerID,
-		&entity.Status,
-		&entity.CreatedAt,
-		&entity.UpdatedAt,
-	)
+func (r *MatchingMySQLRepository) FindByParticipants(ctx context.Context, meID, partnerID uuid.UUID) (*model.Matching, error) {
+	q := transaction.GetQueries(ctx, r.queries)
+	matching, err := q.GetMatchingByParticipants(ctx, sqlc.GetMatchingByParticipantsParams{
+		MeID:      meID.String(),
+		PartnerID: partnerID.String(),
+	})
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 
-	return dto.ToMatchingModel(&entity)
+	return &model.Matching{
+		ID:        uuid.MustParse(matching.ID),
+		MeID:      uuid.MustParse(matching.MeID),
+		PartnerID: uuid.MustParse(matching.PartnerID),
+		Status:    model.MatchingStatus(matching.Status),
+		CreatedAt: matching.CreatedAt,
+		UpdatedAt: matching.UpdatedAt,
+	}, nil
 }
 
-func (r MatchingMySQLRepository) Remove(ctx context.Context, id uuid.UUID) (*uuid.UUID, error) {
-	query := `DELETE FROM matching WHERE id = ?`
-
-	_, err := r.db.ExecContext(ctx, query, id)
+func (r *MatchingMySQLRepository) Remove(ctx context.Context, id uuid.UUID) (*uuid.UUID, error) {
+	q := transaction.GetQueries(ctx, r.queries)
+	err := q.DeleteMatching(ctx, id.String())
 	if err != nil {
 		return nil, err
 	}
