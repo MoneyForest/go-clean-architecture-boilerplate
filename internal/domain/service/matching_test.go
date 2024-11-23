@@ -9,7 +9,7 @@ import (
 	"github.com/MoneyForest/go-clean-architecture-boilerplate/pkg/uuid"
 )
 
-func TestValidateMatching(t *testing.T) {
+func TestValidate(t *testing.T) {
 	type args struct {
 		me      *model.User
 		partner *model.User
@@ -74,9 +74,9 @@ func TestValidateMatching(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := MatchingDomainService{}
 			ctx := context.Background()
-			err := s.ValidateMatching(ctx, tt.args.me, tt.args.partner)
+			err := s.Validate(ctx, tt.args.me, tt.args.partner)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateMatching() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

@@ -13,7 +13,7 @@ var (
 
 type MatchingDomainService struct{}
 
-func (s *MatchingDomainService) ValidateMatching(ctx context.Context, me, partner *model.User) error {
+func (s *MatchingDomainService) Validate(ctx context.Context, me, partner *model.User) error {
 	// Write the business logic for the match.
 	// For example, a match for an unsubscribed user or a user who violates the Terms of Service is invalid.
 	// It can only be validated by a call to the domain model.

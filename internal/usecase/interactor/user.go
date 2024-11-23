@@ -15,21 +15,21 @@ import (
 
 type UserInteractor struct {
 	txManager transaction.Manager
-	repo      repository.UserRepository
-	cache     repository.UserCacheRepository
+	userRepo  repository.UserRepository
+	userCache repository.UserCacheRepository
 	msgQueue  repository.MessageQueueRepository
 }
 
 func NewUserInteractor(
 	txManager transaction.Manager,
-	repo repository.UserRepository,
-	cache repository.UserCacheRepository,
+	userRepo repository.UserRepository,
+	userCache repository.UserCacheRepository,
 	msgQueue repository.MessageQueueRepository,
 ) UserInteractor {
 	return UserInteractor{
 		txManager: txManager,
-		repo:      repo,
-		cache:     cache,
+		userRepo:  userRepo,
+		userCache: userCache,
 		msgQueue:  msgQueue,
 	}
 }
@@ -43,14 +43,14 @@ func (i UserInteractor) Create(ctx context.Context, input *port.CreateUserInput)
 	var createdUser *model.User
 	err := i.txManager.Do(ctx, func(ctx context.Context) error {
 		var err error
-		createdUser, err = i.repo.Save(ctx, user)
+		createdUser, err = i.userRepo.Save(ctx, user)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	if createdUser != nil {
-		if err := i.cache.Store(ctx, createdUser, 3600*time.Second); err != nil {
+		if err := i.userCache.Store(ctx, createdUser, 3600*time.Second); err != nil {
 			log.Printf("failed to set cache: %v\n", err)
 		}
 	}
@@ -59,16 +59,16 @@ func (i UserInteractor) Create(ctx context.Context, input *port.CreateUserInput)
 }
 
 func (i UserInteractor) Get(ctx context.Context, input *port.GetUserInput) (*port.GetUserOutput, error) {
-	user, err := i.cache.FindById(ctx, input.ID)
+	user, err := i.userCache.FindById(ctx, input.ID)
 	if err == nil {
 		return &port.GetUserOutput{User: user}, nil
 	}
-	user, err = i.repo.FindById(ctx, input.ID)
+	user, err = i.userRepo.FindById(ctx, input.ID)
 	if err != nil {
 		return nil, err
 	}
 	if user != nil {
-		if err := i.cache.Store(ctx, user, 3600*time.Second); err != nil {
+		if err := i.userCache.Store(ctx, user, 3600*time.Second); err != nil {
 			log.Printf("failed to set cache: %v\n", err)
 		}
 	}
@@ -76,7 +76,7 @@ func (i UserInteractor) Get(ctx context.Context, input *port.GetUserInput) (*por
 }
 
 func (i UserInteractor) List(ctx context.Context, input *port.ListUserInput) (*port.ListUserOutput, error) {
-	users, err := i.repo.FindAll(ctx, input.Limit, input.Offset)
+	users, err := i.userRepo.FindAll(ctx, input.Limit, input.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -92,14 +92,14 @@ func (i UserInteractor) Update(ctx context.Context, input *port.UpdateUserInput)
 	var updatedUser *model.User
 	err := i.txManager.Do(ctx, func(ctx context.Context) error {
 		var err error
-		updatedUser, err = i.repo.Save(ctx, user)
+		updatedUser, err = i.userRepo.Save(ctx, user)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	if updatedUser != nil {
-		if err := i.cache.Store(ctx, updatedUser, 3600*time.Second); err != nil {
+		if err := i.userCache.Store(ctx, updatedUser, 3600*time.Second); err != nil {
 			log.Printf("failed to set cache: %v\n", err)
 		}
 	}
@@ -110,14 +110,14 @@ func (i UserInteractor) Delete(ctx context.Context, input *port.DeleteUserInput)
 	var deletedID *uuid.UUID
 	err := i.txManager.Do(ctx, func(ctx context.Context) error {
 		var err error
-		deletedID, err = i.repo.Remove(ctx, input.ID)
+		deletedID, err = i.userRepo.Remove(ctx, input.ID)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
 	if deletedID != nil {
-		if err := i.cache.Remove(ctx, *deletedID); err != nil {
+		if err := i.userCache.Remove(ctx, *deletedID); err != nil {
 			log.Printf("failed to delete cache: %v\n", err)
 		}
 	}

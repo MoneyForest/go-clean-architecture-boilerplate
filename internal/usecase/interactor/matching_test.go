@@ -14,11 +14,12 @@ import (
 )
 
 func SetupTestMatchingInteractor(ctx context.Context, gw *testhelper.Gateway) (MatchingInteractor, *repository.UserMySQLRepository) {
-	txManager := transaction.NewMySQLTransactionManager(gw.MySQLClient)
-	matchingRepo := repository.NewMatchingMySQLRepository(gw.MySQLClient)
-	userRepo := repository.NewUserMySQLRepository(gw.MySQLClient)
-	ds := &service.MatchingDomainService{}
-	return NewMatchingInteractor(txManager, matchingRepo, userRepo, ds), userRepo
+	return NewMatchingInteractor(
+		transaction.NewMySQLTransactionManager(gw.MySQLClient),
+		repository.NewMatchingMySQLRepository(gw.MySQLClient),
+		repository.NewUserMySQLRepository(gw.MySQLClient),
+		&service.MatchingDomainService{},
+	), repository.NewUserMySQLRepository(gw.MySQLClient)
 }
 
 func createTestUser(ctx context.Context, t *testing.T, userRepo *repository.UserMySQLRepository) *model.User {
