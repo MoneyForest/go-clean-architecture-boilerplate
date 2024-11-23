@@ -22,7 +22,7 @@ jobs:
       - name: mod download
         run: go mod download
       - name: build
-        run: make go-build
+        run: sudo make go-build
 
   test:
     runs-on: ubuntu-latest
