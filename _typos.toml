@@ -1,2 +1,2 @@
 [files]
-extend-exclude = ["go.mod", "go.sum", "Makefile"]
+extend-exclude = ["go.mod", "go.sum"]
