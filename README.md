@@ -155,6 +155,12 @@ graph TD
 | | CI/CD | [GitHub Actions](https://github.com/features/actions) |
 | **Tools** | Documentation Generator | [swag](https://github.com/swaggo/swag) |
 
+## Setup
+
+```sh
+make setup
+```
+
 ## Development Flow
 
 1. Define Domain Model
@@ -188,7 +194,7 @@ graph TD
 3. Generate OpenAPI documentation
 
    ```sh
-   make swag-gen
+   make gen-swagger
    ```
 
 ### sqlc
@@ -206,7 +212,7 @@ graph TD
    Run the following command to generate code.
 
    ```sh
-   make sqlc-gen
+   make gen-sqlc
    ```
 
 4. Define repository interface & implement repository
