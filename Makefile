@@ -30,4 +30,4 @@ clean:
 	rm -rf ./tools/swag
 
 .PHONY: setup
-setup: docker-setup go-setup db-migrate-setup clean gen-swagger gen-sqlc go-test
+setup: docker-setup go-setup db-migrate-setup clean gen-swagger gen-sqlc
