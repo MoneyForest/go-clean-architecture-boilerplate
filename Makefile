@@ -1,6 +1,6 @@
-include misc/make/docker.mak
-include misc/make/go.mak
-include misc/make/migrate.mak
+include misc/make/docker.make
+include misc/make/go.make
+include misc/make/migrate.make
 
 .PHONY: run-http
 run-http:
