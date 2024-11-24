@@ -1,0 +1,39 @@
+services:
+  mysql:
+    build:
+      context: ./docker/mysql
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: "redis:latest"
+    ports:
+      - 6379:6379
+    command: redis-server --requirepass password
+    volumes:
+      - ./docker/redis/data:/data
+  localstack:
+    build:
+      context: ./docker/localstack
+      dockerfile: Dockerfile
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker/localstack/data:/var/lib/localstack
+    environment:
+      SERVICES: sqs
+      DEBUG: ${DEBUG:-0}
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: ap-northeast-1
+      DISABLE_CORS_CHECKS: 1
+    ports:
+      - 4566:4566

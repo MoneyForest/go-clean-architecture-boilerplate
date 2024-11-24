@@ -1,0 +1,334 @@
+basePath: /api/v1
+definitions:
+  error.DomainError:
+    properties:
+      cause: {}
+      code:
+        $ref: '#/definitions/error.ErrorCode'
+      details:
+        additionalProperties: true
+        type: object
+      message:
+        type: string
+    type: object
+  error.ErrorCode:
+    enum:
+    - INVALID_ARGUMENT
+    - NOT_FOUND
+    - ALREADY_EXISTS
+    - UNAUTHORIZED
+    - PERMISSION_DENIED
+    - PRECONDITION_FAILED
+    - CRITICAL
+    type: string
+    x-enum-varnames:
+    - InvalidArgument
+    - NotFound
+    - AlreadyExists
+    - Unauthorized
+    - PermissionDenied
+    - PreconditionFailed
+    - Critical
+  request.CreateUserRequestBody:
+    properties:
+      email:
+        type: string
+    type: object
+  request.UpdateUserRequestBody:
+    properties:
+      email:
+        type: string
+    type: object
+  response.CreateUserResponse:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  response.DeepHealthResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.DeleteUserResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  response.GetUserResponse:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  response.HealthResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  response.ListUsersResponse:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+      totalPage:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/response.UserResponse'
+        type: array
+    type: object
+  response.UpdateUserResponse:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  response.UserResponse:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server using clean architecture.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Go Clean Architecture API
+  version: "1.0"
+paths:
+  /check:
+    get:
+      consumes:
+      - application/json
+      description: Performs a basic health check of the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: System is healthy
+          schema:
+            $ref: '#/definitions/response.HealthResponse'
+        "503":
+          description: Service unavailable
+          schema:
+            $ref: '#/definitions/response.HealthResponse'
+      summary: Get system health status
+      tags:
+      - health
+  /deep_check:
+    get:
+      consumes:
+      - application/json
+      description: Performs a deep health check including dependent services
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: System is healthy
+          schema:
+            $ref: '#/definitions/response.DeepHealthResponse'
+        "503":
+          description: System is unhealthy
+          schema:
+            $ref: '#/definitions/response.DeepHealthResponse'
+      summary: Get detailed system health status
+      tags:
+      - health
+  /users:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Skip items
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ListUsersResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.DomainError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.DomainError'
+      summary: List all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateUserRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.CreateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.DomainError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.DomainError'
+      summary: Create a new user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.DeleteUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.DomainError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error.DomainError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.DomainError'
+      summary: Delete user by ID
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.GetUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.DomainError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error.DomainError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.DomainError'
+      summary: Get user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateUserRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UpdateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.DomainError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error.DomainError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.DomainError'
+      summary: Update user by ID
+      tags:
+      - users
+swagger: "2.0"

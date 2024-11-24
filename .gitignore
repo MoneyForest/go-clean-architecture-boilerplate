@@ -23,3 +23,16 @@ go.work.sum
 
 # env file
 .env
+.envrc
+
+# Docker
+docker/localstack/data/*
+!docker/localstack/data/.keep
+docker/mysql/data/*
+!docker/mysql/data/.keep
+docker/redis/data/*
+!docker/redis/data/.keep
+
+# Binaries
+.bin/*
+!.bin/.keep
